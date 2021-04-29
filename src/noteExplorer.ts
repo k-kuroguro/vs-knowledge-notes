@@ -166,7 +166,7 @@ export class NoteExplorer {
    private async rename(file: File): Promise<void> {
       if (!file) return;
 
-      const dirname = file.type === vscode.FileType.Directory ? file.uri : vscode.Uri.file(path.dirname(file.uri.fsPath));
+      const dirname = vscode.Uri.file(path.dirname(file.uri.fsPath));
       const input = await vscode.window.showInputBox({
          prompt: 'Enter a name for the file.',
          validateInput: value => {
