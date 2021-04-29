@@ -52,20 +52,20 @@ export class File extends vscode.TreeItem {
 
 		this.tooltip = path.basename(uri.fsPath);
 		this.description = false;
-		this.contextValue = File.toString(type);
+		this.contextValue = File.toContextValue(type);
 		this.command = type === vscode.FileType.File ? { command: `${extensionName}.noteExplorer.openFile`, title: `${extensionDisplayName}: Open File`, arguments: [uri] } : undefined;
 	}
 
-	private static toString(type: vscode.FileType): string {
+	private static toContextValue(type: vscode.FileType): string {
 		switch (type) {
 			case vscode.FileType.File:
-				return 'File';
+				return `${extensionName}.File`;
 			case vscode.FileType.Directory:
-				return 'Directory';
+				return `${extensionName}.Directory`;
 			case vscode.FileType.SymbolicLink:
-				return 'SymbolicLink';
+				return `${extensionName}.SymbolicLink`;
 			case vscode.FileType.Unknown:
-				return 'Unknown';
+				return `${extensionName}.Unknown`;
 		}
 	}
 

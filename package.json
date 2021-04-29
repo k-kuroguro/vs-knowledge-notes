@@ -68,7 +68,7 @@
 		"views": {
 			"simpleNotes": [
 				{
-					"id": "noteExplorer",
+					"id": "simple-notes.noteExplorer",
 					"name": "Note Explorer",
 					"icon": "$(files)",
 					"contextualTitle": "Note Explorer"
@@ -92,7 +92,7 @@
 		},
 		"viewsWelcome": [
 			{
-				"view": "noteExplorer",
+				"view": "simple-notes.noteExplorer",
 				"contents": "No notes directory found.\n[Set Notes Directory](command:simple-notes.setNotesDir)"
 			}
 		],
@@ -100,69 +100,69 @@
 			"view/title": [
 				{
 					"command": "simple-notes.noteExplorer.refresh",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "navigation"
 				},
 				{
 					"command": "simple-notes.noteExplorer.newFolder",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "navigation"
 				},
 				{
 					"command": "simple-notes.noteExplorer.newFile",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
 					"command": "simple-notes.noteExplorer.newFile",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "1_creation@1"
 				},
 				{
 					"command": "simple-notes.noteExplorer.newFolder",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "1_creation@2"
 				},
 				{
 					"command": "simple-notes.noteExplorer.findInFolder",
-					"when": "view == noteExplorer && viewItem == Directory",
+					"when": "view == simple-notes.noteExplorer && viewItem == simple-notes.Directory",
 					"group": "2_finding@1"
 				},
 				{
 					"command": "simple-notes.noteExplorer.cut",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "3_editing@1"
 				},
 				{
 					"command": "simple-notes.noteExplorer.copy",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "3_editing@2"
 				},
 				{
 					"command": "simple-notes.noteExplorer.paste",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "3_editing@3"
 				},
 				{
 					"command": "simple-notes.noteExplorer.copyPath",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "4_path@1"
 				},
 				{
 					"command": "simple-notes.noteExplorer.copyRelativePath",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "4_path@2"
 				},
 				{
 					"command": "simple-notes.noteExplorer.rename",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "5_modification@1"
 				},
 				{
 					"command": "simple-notes.noteExplorer.delete",
-					"when": "view == noteExplorer",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "5_modification@2"
 				}
 			],

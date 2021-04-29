@@ -13,11 +13,11 @@ export class NoteExplorer {
    constructor(context: vscode.ExtensionContext) {
       this.fileSystemProvider = new FileSystemProvider();
       this.watcherDisposer = this.fileSystemProvider.watch(vscode.Uri.file(Config.get(Config.Sections.notesDir)), { recursive: true, excludes: [] });
-      this.treeView = vscode.window.createTreeView('noteExplorer', { treeDataProvider: this.fileSystemProvider });
+      this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.fileSystemProvider });
 
       context.subscriptions.push(
          this.treeView,
-         vscode.workspace.registerFileSystemProvider('noteExplorer', this.fileSystemProvider, { isCaseSensitive: true }),
+         vscode.workspace.registerFileSystemProvider(`${extensionName}.noteExplorer`, this.fileSystemProvider, { isCaseSensitive: true }),
          vscode.workspace.onDidChangeConfiguration(() => {
             this.fileSystemProvider.refresh();
             this.updateWatcher();
