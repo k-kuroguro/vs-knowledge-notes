@@ -1,0 +1,259 @@
+{
+	"name": "simple-notes",
+	"displayName": "Simple Notes",
+	"description": "",
+	"publisher": "k_kuroguro",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.55.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"license": "MIT",
+	"activationEvents": [
+		"*"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "simple-notes.noteExplorer.refresh",
+				"title": "Refresh Explorer",
+				"icon": "$(extensions-refresh)"
+			},
+			{
+				"command": "simple-notes.noteExplorer.newFile",
+				"title": "New File",
+				"icon": "$(new-file)"
+			},
+			{
+				"command": "simple-notes.noteExplorer.newFolder",
+				"title": "New Folder",
+				"icon": "$(new-folder)"
+			},
+			{
+				"command": "simple-notes.noteExplorer.findInFolder",
+				"title": "Find in Folder"
+			},
+			{
+				"command": "simple-notes.noteExplorer.cut",
+				"title": "Cut"
+			},
+			{
+				"command": "simple-notes.noteExplorer.copy",
+				"title": "Copy"
+			},
+			{
+				"command": "simple-notes.noteExplorer.paste",
+				"title": "Paste"
+			},
+			{
+				"command": "simple-notes.noteExplorer.copyPath",
+				"title": "Copy Path"
+			},
+			{
+				"command": "simple-notes.noteExplorer.copyRelativePath",
+				"title": "Copy Relative Path"
+			},
+			{
+				"command": "simple-notes.noteExplorer.rename",
+				"title": "Rename"
+			},
+			{
+				"command": "simple-notes.noteExplorer.delete",
+				"title": "Delete"
+			}
+		],
+		"views": {
+			"simpleNotes": [
+				{
+					"id": "noteExplorer",
+					"name": "Note Explorer",
+					"icon": "$(files)",
+					"contextualTitle": "Note Explorer"
+				},
+				{
+					"id": "dummy",
+					"name": "dummy",
+					"icon": "$(files)",
+					"contextualTitle": "dummy"
+				}
+			]
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "simpleNotes",
+					"title": "Simple Notes",
+					"icon": "$(notebook)"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "noteExplorer",
+				"contents": "No notes directory found.\n[Set Notes Directory](command:simple-notes.setNotesDir)"
+			}
+		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "simple-notes.noteExplorer.refresh",
+					"when": "view == noteExplorer",
+					"group": "navigation"
+				},
+				{
+					"command": "simple-notes.noteExplorer.newFolder",
+					"when": "view == noteExplorer",
+					"group": "navigation"
+				},
+				{
+					"command": "simple-notes.noteExplorer.newFile",
+					"when": "view == noteExplorer",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "simple-notes.noteExplorer.newFile",
+					"when": "view == noteExplorer",
+					"group": "1_creation@1"
+				},
+				{
+					"command": "simple-notes.noteExplorer.newFolder",
+					"when": "view == noteExplorer",
+					"group": "1_creation@2"
+				},
+				{
+					"command": "simple-notes.noteExplorer.findInFolder",
+					"when": "view == noteExplorer && viewItem == Directory",
+					"group": "2_finding@1"
+				},
+				{
+					"command": "simple-notes.noteExplorer.cut",
+					"when": "view == noteExplorer",
+					"group": "3_editing@1"
+				},
+				{
+					"command": "simple-notes.noteExplorer.copy",
+					"when": "view == noteExplorer",
+					"group": "3_editing@2"
+				},
+				{
+					"command": "simple-notes.noteExplorer.paste",
+					"when": "view == noteExplorer",
+					"group": "3_editing@3"
+				},
+				{
+					"command": "simple-notes.noteExplorer.copyPath",
+					"when": "view == noteExplorer",
+					"group": "4_path@1"
+				},
+				{
+					"command": "simple-notes.noteExplorer.copyRelativePath",
+					"when": "view == noteExplorer",
+					"group": "4_path@2"
+				},
+				{
+					"command": "simple-notes.noteExplorer.rename",
+					"when": "view == noteExplorer",
+					"group": "5_modification@1"
+				},
+				{
+					"command": "simple-notes.noteExplorer.delete",
+					"when": "view == noteExplorer",
+					"group": "5_modification@2"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "simple-notes.noteExplorer.refresh",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.newFile",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.newFolder",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.findInFolder",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.cut",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.copy",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.paste",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.copyPath",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.copyRelativePath",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.rename",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.noteExplorer.delete",
+					"when": "false"
+				}
+			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "Simple Notes Configuration",
+			"properties": {
+				"simple-notes.notesDir": {
+					"type": "string",
+					"default": null,
+					"description": "Directory where notes are saved"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run package",
+		"compile": "webpack",
+		"watch": "webpack --watch",
+		"package": "webpack --mode production --devtool hidden-source-map",
+		"test-compile": "tsc -p ./",
+		"test-watch": "tsc -watch -p ./",
+		"pretest": "npm run test-compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/fs-extra": "^9.0.11",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.4",
+		"@types/node": "^12.11.7",
+		"@types/vscode": "^1.55.0",
+		"@typescript-eslint/eslint-plugin": "^4.14.1",
+		"@typescript-eslint/parser": "^4.14.1",
+		"eslint": "^7.19.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.2.1",
+		"ts-loader": "^8.0.14",
+		"typescript": "^4.1.3",
+		"vscode-test": "^1.5.0",
+		"webpack": "^5.19.0",
+		"webpack-cli": "^4.4.0"
+	},
+	"dependencies": {
+		"fs-extra": "^9.1.0"
+	}
+}
