@@ -65,6 +65,48 @@
 				"title": "Delete"
 			}
 		],
+		"keybindings": [
+			{
+				"command": "simple-notes.noteExplorer.findInFolder",
+				"key": "shift+alt+f",
+				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+			},
+			{
+				"command": "simple-notes.noteExplorer.cut",
+				"key": "ctrl+x",
+				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+			},
+			{
+				"command": "simple-notes.noteExplorer.copy",
+				"key": "ctrl+c",
+				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+			},
+			{
+				"command": "simple-notes.noteExplorer.paste",
+				"key": "ctrl+v",
+				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+			},
+			{
+				"command": "simple-notes.noteExplorer.copyPath",
+				"key": "shift+alt+c",
+				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+			},
+			{
+				"command": "simple-notes.noteExplorer.copyRelativePath",
+				"key": "ctrl+shift+c",
+				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+			},
+			{
+				"command": "simple-notes.noteExplorer.rename",
+				"key": "f2",
+				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+			},
+			{
+				"command": "simple-notes.noteExplorer.delete",
+				"key": "delete",
+				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+			}
+		],
 		"views": {
 			"simpleNotes": [
 				{
