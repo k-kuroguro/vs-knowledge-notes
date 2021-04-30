@@ -93,7 +93,13 @@
 		"viewsWelcome": [
 			{
 				"view": "simple-notes.noteExplorer",
-				"contents": "No notes directory found.\n[Set Notes Directory](command:simple-notes.setNotesDir)"
+				"contents": "No notes directory found.\n[Set Notes Directory](command:simple-notes.setNotesDir)",
+				"when": "!config.simple-notes.notesDir"
+			},
+			{
+				"view": "simple-notes.noteExplorer",
+				"contents": "Loading notes directory.",
+				"when": "config.simple-notes.notesDir"
 			}
 		],
 		"menus": {
