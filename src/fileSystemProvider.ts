@@ -112,7 +112,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode
 	readonly onDidChangeTreeData: vscode.Event<File | undefined | void> = this._onDidChangeTreeData.event;
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._onDidChangeFile.event;
 
-	private notesDir?: string;
+	private notesDir?: vscode.Uri;
 	private clipboard?: { uri: vscode.Uri, cut: boolean };
 
 	setClipboard(uri?: vscode.Uri, cut?: boolean): void {
@@ -124,11 +124,11 @@ export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode
 	}
 
 	constructor() {
-		this.notesDir = Config.get(Config.Sections.notesDir);
+		this.notesDir = Config.notesDir;
 	}
 
 	refresh(): void {
-		this.notesDir = Config.get(Config.Sections.notesDir);
+		this.notesDir = Config.notesDir;
 		this._onDidChangeTreeData.fire();
 	}
 
@@ -150,8 +150,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode
 			return children.map(([name, type]) => new File(vscode.Uri.file(name), type));
 		}
 
-		const dirPath = this.notesDir;
-		const children = await this.readDirectory(vscode.Uri.file(dirPath));
+		const children = await this.readDirectory(this.notesDir);
 		children.sort((a, b) => {
 			if (a[1] === b[1]) {
 				return a[0].localeCompare(b[0]);

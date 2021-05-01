@@ -13,8 +13,8 @@ export class NoteExplorer {
    constructor(context: vscode.ExtensionContext) {
       this.fileSystemProvider = new FileSystemProvider();
       this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.fileSystemProvider, showCollapseAll: true });
-      if (Config.get(Config.Sections.notesDir)) {
-         this.watcherDisposer = this.fileSystemProvider.watch(vscode.Uri.file(Config.get(Config.Sections.notesDir)), { recursive: true, excludes: [] });
+      if (Config.notesDir) {
+         this.watcherDisposer = this.fileSystemProvider.watch(Config.notesDir, { recursive: true, excludes: [] });
       } else {
          this.watcherDisposer = { dispose: () => { } }
       }
@@ -37,7 +37,11 @@ export class NoteExplorer {
 
    private updateWatcher(): void {
       this.watcherDisposer.dispose();
-      this.watcherDisposer = this.fileSystemProvider.watch(vscode.Uri.file(Config.get(Config.Sections.notesDir)), { recursive: true, excludes: [] });
+      if (Config.notesDir) {
+         this.watcherDisposer = this.fileSystemProvider.watch(Config.notesDir, { recursive: true, excludes: [] });
+      } else {
+         this.watcherDisposer = { dispose: () => { } }
+      }
    }
 
    /* commands */
@@ -70,7 +74,8 @@ export class NoteExplorer {
    }
 
    private createNewFile(file?: File): void {
-      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(vscode.Uri.file(Config.get(Config.Sections.notesDir)), vscode.FileType.Directory);
+      if (!Config.notesDir) return;
+      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
       const dirPath: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
 
       let count = 1;
@@ -89,7 +94,8 @@ export class NoteExplorer {
    }
 
    private createNewFolder(file?: File): void {
-      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(vscode.Uri.file(Config.get(Config.Sections.notesDir)), vscode.FileType.Directory);
+      if (!Config.notesDir) return;
+      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
       const dirPath: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
 
       let count = 1;
@@ -172,9 +178,10 @@ export class NoteExplorer {
    }
 
    private copyRelativePath(file?: File): void {
+      if (!Config.notesDir) return;
       if (!file && !this.treeView.selection.length) return;
       const selectedFile: File = file ? file : this.treeView.selection[0];
-      vscode.env.clipboard.writeText(path.relative(Config.get(Config.Sections.notesDir), selectedFile.uri.fsPath));
+      vscode.env.clipboard.writeText(path.relative(Config.notesDir.fsPath, selectedFile.uri.fsPath));
    }
 
    private async rename(file?: File): Promise<void> {

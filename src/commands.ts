@@ -10,7 +10,7 @@ async function setNotesDir() {
    });
    if (!selectedUris) return;
    const selectedDir = selectedUris[0];
-   Config.update(Config.Sections.notesDir, selectedDir.fsPath);
+   Config.notesDir = selectedDir;
 }
 
 export function registerCommands(context: vscode.ExtensionContext): void {
