@@ -22,6 +22,14 @@ export class Config {
       this.config.update('notesDir', uri?.fsPath, ConfigurationTarget.Global);
    }
 
+   static get confirmDelete(): boolean {
+      return this.config.get('confirmDelete') ?? false;
+   }
+
+   static set confirmDelete(confirm: boolean) {
+      this.config.update('confirmDelete', confirm, ConfigurationTarget.Global);
+   }
+
 }
 
 Config.load();

@@ -269,6 +269,11 @@
 					"type": "string",
 					"default": null,
 					"description": "Directory where notes are saved"
+				},
+				"simple-notes.confirmDelete": {
+					"type": "boolean",
+					"default": true,
+					"description": "Controls whether the explorer should ask for confirmation when deleting a file."
 				}
 			}
 		}

@@ -206,7 +206,11 @@ export class NoteExplorer {
    private async delete(file?: File): Promise<void> {
       if (!file && !this.treeView.selection.length) return;
       const selectedFile: File = file ? file : this.treeView.selection[0];
-      if (await vscode.window.showWarningMessage(`Are you sure you want to delete "${path.basename(selectedFile.uri.fsPath)}"?`, 'Delete', 'Cancel') === 'Cancel') return;
+      if (Config.confirmDelete) {
+         const input = await vscode.window.showWarningMessage(`Are you sure you want to delete "${path.basename(selectedFile.uri.fsPath)}"?`, 'Delete', 'Cancel', 'Do not ask me again');
+         if (input == 'Cancel') return;
+         if (input == 'Do not ask me again') Config.confirmDelete = false;
+      }
       this.fileSystemProvider.delete(selectedFile.uri, { recursive: true });
    }
 
