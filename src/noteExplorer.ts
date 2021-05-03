@@ -13,7 +13,7 @@ export class NoteExplorer {
    constructor(context: vscode.ExtensionContext) {
       this.fileSystemProvider = new FileSystemProvider();
       this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.fileSystemProvider, showCollapseAll: true });
-      if (Config.notesDir) {
+      if (Config.notesDir && this.fileSystemProvider.exists(Config.notesDir)) {
          this.watcherDisposer = this.fileSystemProvider.watch(Config.notesDir, { recursive: true, excludes: [] });
       } else {
          this.watcherDisposer = { dispose: () => { } }
@@ -22,10 +22,10 @@ export class NoteExplorer {
       context.subscriptions.push(
          this.treeView,
          vscode.workspace.registerFileSystemProvider(`${extensionName}.noteExplorer`, this.fileSystemProvider, { isCaseSensitive: true }),
-         vscode.workspace.onDidChangeConfiguration(() => {
+         Config.onDidChangeConfig(() => {
             this.fileSystemProvider.refresh();
             this.updateWatcher();
-         }),
+         })
       );
 
       this.registerCommands(context);
@@ -37,7 +37,7 @@ export class NoteExplorer {
 
    private updateWatcher(): void {
       this.watcherDisposer.dispose();
-      if (Config.notesDir) {
+      if (Config.notesDir && this.fileSystemProvider.exists(Config.notesDir)) {
          this.watcherDisposer = this.fileSystemProvider.watch(Config.notesDir, { recursive: true, excludes: [] });
       } else {
          this.watcherDisposer = { dispose: () => { } }

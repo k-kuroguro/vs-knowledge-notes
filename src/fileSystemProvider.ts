@@ -138,6 +138,10 @@ export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode
 
 	async getChildren(element?: File): Promise<File[]> {
 		if (!this.notesDir) return [];
+		if (!this.exists(this.notesDir)) {
+			vscode.window.showErrorMessage(`${this.notesDir.fsPath} is invalid path.`);
+			return [];
+		}
 
 		if (element) {
 			const children = await this.readDirectory(element.uri);
@@ -238,7 +242,6 @@ export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode
 			} as vscode.FileChangeEvent]);
 			this._onDidChangeTreeData.fire();
 		});
-
 		return { dispose: () => watcher.close() };
 	}
 
