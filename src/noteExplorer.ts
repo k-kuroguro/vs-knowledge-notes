@@ -3,6 +3,7 @@ import * as path from 'path';
 import { FileSystemProvider, File } from './fileSystemProvider';
 import { Config } from './config';
 import { extensionName } from './constants';
+import { DisplayMode } from './types';
 
 export class NoteExplorer {
 
@@ -65,8 +66,25 @@ export class NoteExplorer {
 
    private async openFile(uri: vscode.Uri): Promise<void> {
       if (!uri) return;
-      await vscode.commands.executeCommand('vscode.open', uri);
-      await vscode.commands.executeCommand('workbench.action.focusSideBar');
+      if (Config.displayMode === DisplayMode.edit || path.extname(uri.fsPath) != '.md') {
+         await vscode.commands.executeCommand('vscode.open', uri);
+         await vscode.commands.executeCommand('workbench.action.focusSideBar');
+         return;
+      }
+      switch (Config.previewEngine) {
+         case 'enhanced':
+            await vscode.commands.executeCommand('vscode.open', uri);
+            await vscode.commands.executeCommand('markdown-preview-enhanced.openPreviewToTheSide', uri);
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+            if (Config.singlePreview) Config.singlePreview = false; // allow multiple preview
+            break;
+         case 'default':
+         default:
+            await vscode.commands.executeCommand('markdown.showPreview', uri);
+            await vscode.commands.executeCommand('markdown.preview.toggleLock'); // allow multiple preview
+            break;
+      }
+      setTimeout(() => { vscode.commands.executeCommand('workbench.action.focusSideBar'); }, 300); // Focus tree view after rendering markdown
    }
 
    private refresh(): void {

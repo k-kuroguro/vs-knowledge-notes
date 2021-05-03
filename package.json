@@ -63,6 +63,10 @@
 			{
 				"command": "simple-notes.noteExplorer.delete",
 				"title": "Delete"
+			},
+			{
+				"command": "simple-notes.toggleDisplayMode",
+				"title": "Simple Notes: Toggle Display Mode"
 			}
 		],
 		"keybindings": [
@@ -279,10 +283,22 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Controls whether the explorer should ask for confirmation when deleting a file."
+				},
+				"simple-notes.previewEngine": {
+					"type": "string",
+					"default": "default",
+					"enum": [
+						"default",
+						"enhanced"
+					],
+					"description": "The engine to use when displaying the preview."
 				}
 			}
 		}
 	},
+	"extensionDependencies": [
+		"shd101wyy.markdown-preview-enhanced"
+	],
 	"scripts": {
 		"vscode:prepublish": "npm run package",
 		"compile": "webpack",
