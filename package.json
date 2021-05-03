@@ -141,7 +141,12 @@
 			{
 				"view": "simple-notes.noteExplorer",
 				"contents": "Loading notes directory.",
-				"when": "config.simple-notes.notesDir"
+				"when": "config.simple-notes.notesDir && !simple-notes.isEmptyNotesDir"
+			},
+			{
+				"view": "simple-notes.noteExplorer",
+				"contents": "Notes directory is empty.",
+				"when": "config.simple-notes.notesDir && simple-notes.isEmptyNotesDir"
 			}
 		],
 		"menus": {
