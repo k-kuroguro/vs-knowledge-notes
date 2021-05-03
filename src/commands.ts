@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { Config } from './config';
 import { extensionName } from './constants'
-import { DisplayMode } from './types';
 
 async function setNotesDir() {
    const selectedUris = await vscode.window.showOpenDialog({
@@ -10,8 +9,7 @@ async function setNotesDir() {
       canSelectMany: false,
    });
    if (!selectedUris) return;
-   const selectedDir = selectedUris[0];
-   Config.notesDir = selectedDir;
+   Config.notesDir = selectedUris[0];
 }
 
 function toggleDisplayMode() {
