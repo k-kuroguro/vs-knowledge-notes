@@ -2,7 +2,7 @@
 	"name": "simple-notes",
 	"displayName": "Simple Notes",
 	"description": "",
-	"publisher": "k_kuroguro",
+	"publisher": "k-kuroguro",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.55.0"
@@ -328,6 +328,7 @@
 		"webpack-cli": "^4.4.0"
 	},
 	"dependencies": {
-		"fs-extra": "^9.1.0"
+		"fs-extra": "^9.1.0",
+		"vscode-ripgrep": "^1.11.3"
 	}
 }
