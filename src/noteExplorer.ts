@@ -130,10 +130,15 @@ export class NoteExplorer {
    }
 
    private findInFolder(file?: File): void {
-      if (!file && !this.treeView.selection.length) return;
-      const selectedFile: File = file ? file : this.treeView.selection[0];
-      if (selectedFile.type !== vscode.FileType.Directory) return;
-      //TODO: add search web view
+      if (!Config.notesDir) return;
+      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
+      const dirPath: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
+      vscode.commands.executeCommand('workbench.action.findInFiles', {
+         query: '',
+         replace: '',
+         filesToInclude: path.resolve(Config.notesDir.fsPath, dirPath.fsPath),
+         filesToExclude: ""
+      });
    }
 
    private cut(file?: File): void {

@@ -184,7 +184,7 @@
 				},
 				{
 					"command": "simple-notes.noteExplorer.findInFolder",
-					"when": "view == simple-notes.noteExplorer && viewItem == simple-notes.Directory",
+					"when": "view == simple-notes.noteExplorer",
 					"group": "2_finding@1"
 				},
 				{
