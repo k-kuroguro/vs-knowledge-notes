@@ -5,8 +5,8 @@ import { DisplayMode } from "./types";
 
 export class Config {
 
-   private static _onDidChangeConfig: vscode.EventEmitter<undefined | void> = new vscode.EventEmitter<undefined | void>();
-   static readonly onDidChangeConfig: vscode.Event<undefined | void> = Config._onDidChangeConfig.event;
+   private static _onDidChangeConfig: vscode.EventEmitter<Config.ConfigItem | undefined | void> = new vscode.EventEmitter<Config.ConfigItem | undefined | void>();
+   static readonly onDidChangeConfig: vscode.Event<Config.ConfigItem | undefined | void> = Config._onDidChangeConfig.event;
 
    private static config: vscode.WorkspaceConfiguration;
 
@@ -28,7 +28,7 @@ export class Config {
 
    static set notesDir(uri: vscode.Uri | undefined) {
       this.config.update('notesDir', uri?.fsPath, vscode.ConfigurationTarget.Global);
-      Config._onDidChangeConfig.fire();
+      Config._onDidChangeConfig.fire(Config.ConfigItem.notesDir);
    }
 
    static get confirmDelete(): boolean {
@@ -37,7 +37,7 @@ export class Config {
 
    static set confirmDelete(confirm: boolean) {
       this.config.update('confirmDelete', confirm, vscode.ConfigurationTarget.Global);
-      Config._onDidChangeConfig.fire();
+      Config._onDidChangeConfig.fire(Config.ConfigItem.confirmDelete);
    }
 
    static get previewEngine(): Config.PreviewEngine {
@@ -46,7 +46,7 @@ export class Config {
 
    static set previewEngine(engine: Config.PreviewEngine) {
       this.config.update('previewEngine', engine, vscode.ConfigurationTarget.Global);
-      Config._onDidChangeConfig.fire();
+      Config._onDidChangeConfig.fire(Config.ConfigItem.previewEngine);
    }
 
    static get singlePreview(): boolean {
@@ -55,6 +55,7 @@ export class Config {
 
    static set singlePreview(singlePreview: boolean) {
       vscode.workspace.getConfiguration('markdown-preview-enhanced').update('singlePreview', singlePreview, vscode.ConfigurationTarget.Global);
+      Config._onDidChangeConfig.fire(Config.ConfigItem.singlePreview);
    }
 
    private static _displayMode: DisplayMode = DisplayMode.edit;
@@ -65,14 +66,22 @@ export class Config {
 
    static set displayMode(mode: DisplayMode) {
       Config._displayMode = mode;
-      Config._onDidChangeConfig.fire();
+      Config._onDidChangeConfig.fire(Config.ConfigItem.displayMode);
    }
 
 }
 
 export namespace Config {
 
-   export type PreviewEngine = "default" | "enhanced";
+   export const ConfigItem = {
+      notesDir: 1,
+      confirmDelete: 2,
+      previewEngine: 3,
+      singlePreview: 4,
+      displayMode: 5
+   } as const;
+   export type ConfigItem = typeof ConfigItem[keyof typeof ConfigItem];
+   export type PreviewEngine = 'default' | 'enhanced';
 
 }
 

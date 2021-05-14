@@ -23,9 +23,11 @@ export class NoteExplorer {
       context.subscriptions.push(
          this.treeView,
          vscode.workspace.registerFileSystemProvider(`${extensionName}.noteExplorer`, this.fileSystemProvider, { isCaseSensitive: true }),
-         Config.onDidChangeConfig(() => {
-            this.fileSystemProvider.refresh();
-            this.updateWatcher();
+         Config.onDidChangeConfig(e => {
+            if (!e || e === Config.ConfigItem.notesDir) {
+               this.fileSystemProvider.refresh();
+               this.updateWatcher();
+            }
          })
       );
 
