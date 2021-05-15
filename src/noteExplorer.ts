@@ -5,15 +5,69 @@ import { Config } from './config';
 import { extensionName } from './constants';
 import { DisplayMode } from './types';
 
+export class TreeDataProvider implements vscode.TreeDataProvider<File> {
+
+   private _onDidChangeTreeData: vscode.EventEmitter<File | undefined | void> = new vscode.EventEmitter<File | undefined | void>();
+   readonly onDidChangeTreeData: vscode.Event<File | undefined | void> = this._onDidChangeTreeData.event;
+
+   private notesDir?: vscode.Uri;
+
+   constructor(private readonly fileSystemProvider: FileSystemProvider) {
+      this.notesDir = Config.notesDir;
+   }
+
+   refresh(): void {
+      this.notesDir = Config.notesDir;
+      this._onDidChangeTreeData.fire();
+   }
+
+   getTreeItem(element: File): vscode.TreeItem {
+      return element;
+   }
+
+   async getChildren(element?: File): Promise<File[]> {
+      if (!this.notesDir) return [];
+      if (!this.fileSystemProvider.exists(this.notesDir)) {
+         vscode.window.showErrorMessage(`${this.notesDir.fsPath} is invalid path.`);
+         return [];
+      }
+
+      if (element) {
+         const children = await this.fileSystemProvider.readDirectory(element.uri);
+         children.sort((a, b) => {
+            if (a[1] === b[1]) {
+               return a[0].localeCompare(b[0]);
+            }
+            return a[1] === vscode.FileType.Directory ? -1 : 1;
+         });
+         return children.map(([name, type]) => new File(vscode.Uri.file(name), type));
+      }
+
+      const children = await this.fileSystemProvider.readDirectory(this.notesDir);
+      children.sort((a, b) => {
+         if (a[1] === b[1]) {
+            return a[0].localeCompare(b[0]);
+         }
+         return a[1] === vscode.FileType.Directory ? -1 : 1;
+      });
+
+      if (!children.length) await vscode.commands.executeCommand('setContext', `${extensionName}.isEmptyNotesDir`, true);
+      else await vscode.commands.executeCommand('setContext', `${extensionName}.isEmptyNotesDir`, false);
+
+      return children.map(([name, type]) => new File(vscode.Uri.file(name), type));
+   }
+
+}
+
 export class NoteExplorer {
 
    private watcherDisposer: vscode.Disposable;
-   private readonly fileSystemProvider: FileSystemProvider;
+   private readonly treeDataProvider: TreeDataProvider;
    private readonly treeView: vscode.TreeView<File>;
 
-   constructor(context: vscode.ExtensionContext) {
-      this.fileSystemProvider = new FileSystemProvider();
-      this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.fileSystemProvider, showCollapseAll: true });
+   constructor(context: vscode.ExtensionContext, private readonly fileSystemProvider: FileSystemProvider) {
+      this.treeDataProvider = new TreeDataProvider(fileSystemProvider);
+      this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
       if (Config.notesDir && this.fileSystemProvider.exists(Config.notesDir)) {
          this.watcherDisposer = this.fileSystemProvider.watch(Config.notesDir, { recursive: true, excludes: [] });
       } else {
@@ -25,9 +79,12 @@ export class NoteExplorer {
          vscode.workspace.registerFileSystemProvider(`${extensionName}.noteExplorer`, this.fileSystemProvider, { isCaseSensitive: true }),
          Config.onDidChangeConfig(e => {
             if (!e || e === Config.ConfigItem.notesDir) {
-               this.fileSystemProvider.refresh();
+               this.treeDataProvider.refresh();
                this.updateWatcher();
             }
+         }),
+         this.fileSystemProvider.onDidChangeFile(() => {
+            this.treeDataProvider.refresh();
          })
       );
 
@@ -90,7 +147,7 @@ export class NoteExplorer {
    }
 
    private refresh(): void {
-      this.fileSystemProvider.refresh();
+      this.treeDataProvider.refresh();
    }
 
    private createNewFile(file?: File): void {

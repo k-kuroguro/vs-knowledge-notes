@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import { Config } from './config';
 import { extensionDisplayName, extensionName } from './constants';
 
 class Utils {
@@ -39,39 +38,7 @@ class Utils {
 
 }
 
-export class File extends vscode.TreeItem {
-
-	public readonly command?: vscode.Command;
-	public readonly contextValue: string;
-
-	constructor(
-		public readonly uri: vscode.Uri,
-		public readonly type: vscode.FileType
-	) {
-		super(uri, type === vscode.FileType.Directory ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
-
-		this.tooltip = path.basename(uri.fsPath);
-		this.description = false;
-		this.contextValue = File.toContextValue(type);
-		this.command = type === vscode.FileType.File ? { command: `${extensionName}.noteExplorer.openFile`, title: `${extensionDisplayName}: Open File`, arguments: [uri] } : undefined;
-	}
-
-	private static toContextValue(type: vscode.FileType): string {
-		switch (type) {
-			case vscode.FileType.File:
-				return `${extensionName}.File`;
-			case vscode.FileType.Directory:
-				return `${extensionName}.Directory`;
-			case vscode.FileType.SymbolicLink:
-				return `${extensionName}.SymbolicLink`;
-			case vscode.FileType.Unknown:
-				return `${extensionName}.Unknown`;
-		}
-	}
-
-}
-
-export class FileStat implements vscode.FileStat {
+class FileStat implements vscode.FileStat {
 
 	constructor(private fsStat: fs.Stats) { }
 
@@ -105,15 +72,46 @@ export class FileStat implements vscode.FileStat {
 
 }
 
-export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode.FileSystemProvider {
+export class File extends vscode.TreeItem {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<File | undefined | void> = new vscode.EventEmitter<File | undefined | void>();
+	public readonly command?: vscode.Command;
+	public readonly contextValue: string;
+
+	constructor(
+		public readonly uri: vscode.Uri,
+		public readonly type: vscode.FileType
+	) {
+		super(uri, type === vscode.FileType.Directory ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
+
+		this.tooltip = path.basename(uri.fsPath);
+		this.description = false;
+		this.contextValue = File.toContextValue(type);
+		this.command = type === vscode.FileType.File ? { command: `${extensionName}.noteExplorer.openFile`, title: `${extensionDisplayName}: Open File`, arguments: [uri] } : undefined;
+	}
+
+	private static toContextValue(type: vscode.FileType): string {
+		switch (type) {
+			case vscode.FileType.File:
+				return `${extensionName}.File`;
+			case vscode.FileType.Directory:
+				return `${extensionName}.Directory`;
+			case vscode.FileType.SymbolicLink:
+				return `${extensionName}.SymbolicLink`;
+			case vscode.FileType.Unknown:
+				return `${extensionName}.Unknown`;
+		}
+	}
+
+}
+
+export class FileSystemProvider implements vscode.FileSystemProvider {
+
 	private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]> = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
-	readonly onDidChangeTreeData: vscode.Event<File | undefined | void> = this._onDidChangeTreeData.event;
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._onDidChangeFile.event;
 
-	private notesDir?: vscode.Uri;
 	private clipboard?: { uri: vscode.Uri, cut: boolean };
+
+	constructor() { }
 
 	setClipboard(uri?: vscode.Uri, cut?: boolean): void {
 		this.clipboard = (!uri || cut === void 0) ? undefined : { uri, cut };
@@ -121,51 +119,6 @@ export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode
 
 	getClipboard(): { uri: vscode.Uri, cut: boolean } | undefined {
 		return this.clipboard;
-	}
-
-	constructor() {
-		this.notesDir = Config.notesDir;
-	}
-
-	refresh(): void {
-		this.notesDir = Config.notesDir;
-		this._onDidChangeTreeData.fire();
-	}
-
-	getTreeItem(element: File): vscode.TreeItem {
-		return element;
-	}
-
-	async getChildren(element?: File): Promise<File[]> {
-		if (!this.notesDir) return [];
-		if (!this.exists(this.notesDir)) {
-			vscode.window.showErrorMessage(`${this.notesDir.fsPath} is invalid path.`);
-			return [];
-		}
-
-		if (element) {
-			const children = await this.readDirectory(element.uri);
-			children.sort((a, b) => {
-				if (a[1] === b[1]) {
-					return a[0].localeCompare(b[0]);
-				}
-				return a[1] === vscode.FileType.Directory ? -1 : 1;
-			});
-			return children.map(([name, type]) => new File(vscode.Uri.file(name), type));
-		}
-
-		const children = await this.readDirectory(this.notesDir);
-		children.sort((a, b) => {
-			if (a[1] === b[1]) {
-				return a[0].localeCompare(b[0]);
-			}
-			return a[1] === vscode.FileType.Directory ? -1 : 1;
-		});
-
-		if (!children.length) await vscode.commands.executeCommand('setContext', `${extensionName}.isEmptyNotesDir`, true);
-		else await vscode.commands.executeCommand('setContext', `${extensionName}.isEmptyNotesDir`, false);
-
-		return children.map(([name, type]) => new File(vscode.Uri.file(name), type));
 	}
 
 	createDirectory(uri: vscode.Uri): void | Promise<void> {
@@ -235,7 +188,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode
 		});
 	}
 
-	// exclude is unsupported
+	//HACK: exclude is unsupported
 	watch(uri: vscode.Uri, options: { excludes: string[], recursive: boolean }): vscode.Disposable {
 		const watcher = fs.watch(uri.fsPath, { recursive: options.recursive }, async (event: string, fileName: string | Buffer) => {
 			const filePath: vscode.Uri = vscode.Uri.joinPath(uri, fileName.toString());
@@ -243,7 +196,6 @@ export class FileSystemProvider implements vscode.TreeDataProvider<File>, vscode
 				type: event === 'change' ? vscode.FileChangeType.Changed : this.exists(filePath) ? vscode.FileChangeType.Created : vscode.FileChangeType.Deleted,
 				uri: filePath
 			} as vscode.FileChangeEvent]);
-			this._onDidChangeTreeData.fire();
 		});
 		return { dispose: () => watcher.close() };
 	}
