@@ -14,11 +14,11 @@ suite('Extension Test Suite', () => {
 
 	test('Activation test', async () => {
 		await extension.activate();
-		assert.equal(extension.isActive, true);
+		assert.strictEqual(extension.isActive, true);
 	});
 
 	test('Extension loads in VSCode and is active', async () => {
 		await timeout(1500);
-		assert.equal(extension.isActive, true);
+		assert.strictEqual(extension.isActive, true);
 	});
 });
