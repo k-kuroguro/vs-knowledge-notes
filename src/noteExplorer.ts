@@ -123,6 +123,19 @@ export class NoteExplorer {
       );
    }
 
+   private async showFileNameInputBox(dirname?: vscode.Uri): Promise<string | undefined> {
+      const input = await vscode.window.showInputBox({
+         prompt: 'Enter a name for the file.',
+         validateInput: value => {
+            if (value == '') return 'Please input any string.';
+            if (/[/\\:?*"<>|]/.test(value)) return 'File name may not contain /\\:?*"<>|';
+            if (dirname && this.fileSystemProvider.exists(vscode.Uri.joinPath(dirname, value))) return `${value} is already exists.`;
+            return;
+         }
+      });
+      if (input && dirname) return input && dirname ? path.join(dirname.fsPath, input) : input;
+   }
+
    private async openFile(uri: vscode.Uri): Promise<void> {
       if (!uri) return;
       if (Config.displayMode === DisplayMode.edit || path.extname(uri.fsPath) != '.md') {
@@ -150,52 +163,40 @@ export class NoteExplorer {
       this.treeDataProvider.refresh();
    }
 
-   private createNewFile(file?: File): void {
+   private async createNewFile(file?: File): Promise<void> {
       if (!Config.notesDir) return;
       const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
-      const dirPath: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
+      const dirname: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
 
-      let count = 1;
-      let filePath: vscode.Uri = vscode.Uri.joinPath(dirPath, 'New file');
-      while (this.fileSystemProvider.exists(filePath)) {
-         filePath = vscode.Uri.joinPath(dirPath, `New file (${count++})`);
-         if (count > 100) {
-            vscode.window.showErrorMessage('File named "New file (n)" has reached creation limit. Please delete these files.');
-            return;
-         }
-      }
+      const input = await this.showFileNameInputBox(dirname);
+      if (!input) return;
+      const filename = vscode.Uri.file(input);
 
-      this.fileSystemProvider.writeFile(filePath, new Uint8Array(), { create: true, overwrite: false });
+      this.fileSystemProvider.writeFile(filename, new Uint8Array(), { create: true, overwrite: false });
 
-      this.openFile(filePath);
+      this.openFile(filename);
    }
 
-   private createNewFolder(file?: File): void {
+   private async createNewFolder(file?: File): Promise<void> {
       if (!Config.notesDir) return;
       const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
-      const dirPath: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
+      const dirname: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
 
-      let count = 1;
-      let filePath: vscode.Uri = vscode.Uri.joinPath(dirPath, 'New folder');
-      while (this.fileSystemProvider.exists(filePath)) {
-         filePath = vscode.Uri.joinPath(dirPath, `New folder (${count++})`);
-         if (count > 100) {
-            vscode.window.showErrorMessage('Folder named "New folder (n)" has reached creation limit. Please delete these folders.');
-            return;
-         }
-      }
+      const input = await this.showFileNameInputBox(dirname);
+      if (!input) return;
+      const filename = vscode.Uri.file(input);
 
-      this.fileSystemProvider.createDirectory(filePath);
+      this.fileSystemProvider.createDirectory(filename);
    }
 
    private findInFolder(file?: File): void {
       if (!Config.notesDir) return;
       const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
-      const dirPath: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
+      const dirname: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
       vscode.commands.executeCommand('workbench.action.findInFiles', {
          query: '',
          replace: '',
-         filesToInclude: path.resolve(Config.notesDir.fsPath, dirPath.fsPath),
+         filesToInclude: path.resolve(Config.notesDir.fsPath, dirname.fsPath),
          filesToExclude: ""
       });
    }
@@ -271,18 +272,10 @@ export class NoteExplorer {
       const selectedFile: File = file ? file : this.treeView.selection[0];
 
       const dirname = vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
-      const input = await vscode.window.showInputBox({
-         prompt: 'Enter a name for the file.',
-         validateInput: value => {
-            if (value == '') return 'Please input any string.';
-            if (/[/\\:?*"<>|]/.test(value)) return 'File name may not contain /\\:?*"<>|';
-            if (this.fileSystemProvider.exists(vscode.Uri.joinPath(dirname, value))) return `${value} is already exists.`;
-            return;
-         }
-      });
+      const input = await this.showFileNameInputBox(dirname);
       if (!input) return;
 
-      this.fileSystemProvider.rename(selectedFile.uri, vscode.Uri.joinPath(dirname, input), { overwrite: false });
+      this.fileSystemProvider.rename(selectedFile.uri, vscode.Uri.file(input), { overwrite: false });
    }
 
    private async delete(file?: File): Promise<void> {
