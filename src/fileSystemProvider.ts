@@ -114,7 +114,7 @@ export class FileSystemProvider implements vscode.FileSystemProvider {
 	constructor() { }
 
 	setClipboard(uri?: vscode.Uri, cut?: boolean): void {
-		this.clipboard = (!uri || cut === void 0) ? undefined : { uri, cut };
+		this.clipboard = (!uri || cut === undefined) ? undefined : { uri, cut };
 	}
 
 	getClipboard(): { uri: vscode.Uri, cut: boolean } | undefined {
@@ -178,7 +178,7 @@ export class FileSystemProvider implements vscode.FileSystemProvider {
 		if (!parentExists) this.createDirectory(vscode.Uri.file(path.dirname(newUri.fsPath)));
 
 		return new Promise<void>((resolve, reject) => {
-			fs.rename(oldUri.fsPath, newUri.fsPath, error => Utils.handleResult(resolve, reject, error, void 0));
+			fs.rename(oldUri.fsPath, newUri.fsPath, error => Utils.handleResult(resolve, reject, error, undefined));
 		});
 	}
 

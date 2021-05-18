@@ -130,7 +130,7 @@ export class NoteExplorer {
             if (value == '') return 'Please input any string.';
             if (/[/\\:?*"<>|]/.test(value)) return 'File name may not contain /\\:?*"<>|';
             if (dirname && this.fileSystemProvider.exists(vscode.Uri.joinPath(dirname, value))) return `${value} is already exists.`;
-            return;
+            return undefined;
          }
       });
       if (input && dirname) return input && dirname ? path.join(dirname.fsPath, input) : input;
