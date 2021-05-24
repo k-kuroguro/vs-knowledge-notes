@@ -11,13 +11,14 @@ export class TreeDataProvider implements vscode.TreeDataProvider<File> {
    readonly onDidChangeTreeData: vscode.Event<File | undefined | void> = this._onDidChangeTreeData.event;
 
    private notesDir?: vscode.Uri;
+   private config: Config = Config.getInstance();
 
    constructor(private readonly fileSystemProvider: FileSystemProvider) {
-      this.notesDir = Config.notesDir;
+      this.notesDir = this.config.notesDir;
    }
 
    refresh(): void {
-      this.notesDir = Config.notesDir;
+      this.notesDir = this.config.notesDir;
       this._onDidChangeTreeData.fire();
    }
 
@@ -64,12 +65,13 @@ export class NoteExplorer {
    private watcherDisposer: vscode.Disposable;
    private readonly treeDataProvider: TreeDataProvider;
    private readonly treeView: vscode.TreeView<File>;
+   private readonly config: Config = Config.getInstance();
 
    constructor(context: vscode.ExtensionContext, private readonly fileSystemProvider: FileSystemProvider) {
       this.treeDataProvider = new TreeDataProvider(fileSystemProvider);
       this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
-      if (Config.notesDir && this.fileSystemProvider.exists(Config.notesDir)) {
-         this.watcherDisposer = this.fileSystemProvider.watch(Config.notesDir, { recursive: true, excludes: [] });
+      if (this.config.notesDir && this.fileSystemProvider.exists(this.config.notesDir)) {
+         this.watcherDisposer = this.fileSystemProvider.watch(this.config.notesDir, { recursive: true, excludes: [] });
       } else {
          this.watcherDisposer = { dispose: () => { } }
       }
@@ -77,7 +79,7 @@ export class NoteExplorer {
       context.subscriptions.push(
          this.treeView,
          vscode.workspace.registerFileSystemProvider(`${extensionName}.noteExplorer`, this.fileSystemProvider, { isCaseSensitive: true }),
-         Config.onDidChangeConfig(e => {
+         this.config.onDidChangeConfig(e => {
             if (!e || e === Config.ConfigItem.notesDir) {
                this.treeDataProvider.refresh();
                this.updateWatcher();
@@ -97,8 +99,8 @@ export class NoteExplorer {
 
    private updateWatcher(): void {
       this.watcherDisposer.dispose();
-      if (Config.notesDir && this.fileSystemProvider.exists(Config.notesDir)) {
-         this.watcherDisposer = this.fileSystemProvider.watch(Config.notesDir, { recursive: true, excludes: [] });
+      if (this.config.notesDir && this.fileSystemProvider.exists(this.config.notesDir)) {
+         this.watcherDisposer = this.fileSystemProvider.watch(this.config.notesDir, { recursive: true, excludes: [] });
       } else {
          this.watcherDisposer = { dispose: () => { } }
       }
@@ -138,17 +140,17 @@ export class NoteExplorer {
 
    private async openFile(uri: vscode.Uri): Promise<void> {
       if (!uri) return;
-      if (Config.displayMode === DisplayMode.edit || path.extname(uri.fsPath) != '.md') {
+      if (this.config.displayMode === DisplayMode.edit || path.extname(uri.fsPath) != '.md') {
          await vscode.commands.executeCommand('vscode.open', uri);
          await vscode.commands.executeCommand('workbench.action.focusSideBar');
          return;
       }
-      switch (Config.previewEngine) {
+      switch (this.config.previewEngine) {
          case 'enhanced':
             await vscode.commands.executeCommand('vscode.open', uri);
             await vscode.commands.executeCommand('markdown-preview-enhanced.openPreviewToTheSide', uri);
             await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-            if (Config.singlePreview) Config.singlePreview = false; // allow multiple preview
+            if (this.config.singlePreview) this.config.singlePreview = false; // allow multiple preview
             break;
          case 'default':
          default:
@@ -164,8 +166,8 @@ export class NoteExplorer {
    }
 
    private async createNewFile(file?: File): Promise<void> {
-      if (!Config.notesDir) return;
-      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
+      if (!this.config.notesDir) return;
+      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(this.config.notesDir, vscode.FileType.Directory);
       const dirname: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
 
       const input = await this.showFileNameInputBox(dirname);
@@ -178,8 +180,8 @@ export class NoteExplorer {
    }
 
    private async createNewFolder(file?: File): Promise<void> {
-      if (!Config.notesDir) return;
-      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
+      if (!this.config.notesDir) return;
+      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(this.config.notesDir, vscode.FileType.Directory);
       const dirname: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
 
       const input = await this.showFileNameInputBox(dirname);
@@ -190,13 +192,13 @@ export class NoteExplorer {
    }
 
    private findInFolder(file?: File): void {
-      if (!Config.notesDir) return;
-      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(Config.notesDir, vscode.FileType.Directory);
+      if (!this.config.notesDir) return;
+      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(this.config.notesDir, vscode.FileType.Directory);
       const dirname: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
       vscode.commands.executeCommand('workbench.action.findInFiles', {
          query: '',
          replace: '',
-         filesToInclude: path.resolve(Config.notesDir.fsPath, dirname.fsPath),
+         filesToInclude: path.resolve(this.config.notesDir.fsPath, dirname.fsPath),
          filesToExclude: ""
       });
    }
@@ -261,10 +263,10 @@ export class NoteExplorer {
    }
 
    private copyRelativePath(file?: File): void {
-      if (!Config.notesDir) return;
+      if (!this.config.notesDir) return;
       if (!file && !this.treeView.selection.length) return;
       const selectedFile: File = file ? file : this.treeView.selection[0];
-      vscode.env.clipboard.writeText(path.relative(Config.notesDir.fsPath, selectedFile.uri.fsPath));
+      vscode.env.clipboard.writeText(path.relative(this.config.notesDir.fsPath, selectedFile.uri.fsPath));
    }
 
    private async rename(file?: File): Promise<void> {
@@ -281,10 +283,10 @@ export class NoteExplorer {
    private async delete(file?: File): Promise<void> {
       if (!file && !this.treeView.selection.length) return;
       const selectedFile: File = file ? file : this.treeView.selection[0];
-      if (Config.confirmDelete) {
+      if (this.config.confirmDelete) {
          const input = await vscode.window.showWarningMessage(`Are you sure you want to delete "${path.basename(selectedFile.uri.fsPath)}"?`, 'Delete', 'Cancel', 'Do not ask me again');
          if (input == 'Cancel') return;
-         if (input == 'Do not ask me again') Config.confirmDelete = false;
+         if (input == 'Do not ask me again') this.config.confirmDelete = false;
       }
       this.fileSystemProvider.delete(selectedFile.uri, { recursive: true });
    }

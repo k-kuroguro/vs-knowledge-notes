@@ -5,68 +5,77 @@ import { DisplayMode } from "./types";
 
 export class Config {
 
-   private static _onDidChangeConfig: vscode.EventEmitter<Config.ConfigItem | undefined | void> = new vscode.EventEmitter<Config.ConfigItem | undefined | void>();
-   static readonly onDidChangeConfig: vscode.Event<Config.ConfigItem | undefined | void> = Config._onDidChangeConfig.event;
+   private _onDidChangeConfig: vscode.EventEmitter<Config.ConfigItem | undefined | void> = new vscode.EventEmitter<Config.ConfigItem | undefined | void>();
+   readonly onDidChangeConfig: vscode.Event<Config.ConfigItem | undefined | void> = this._onDidChangeConfig.event;
 
-   private static config: vscode.WorkspaceConfiguration;
+   private static instance: Config = new Config();
+   private workspaceConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(extensionName);
+   private hasSetListener: boolean = false;
 
-   constructor(context: vscode.ExtensionContext) {
+   private constructor() { }
+
+   static getInstance(): Config {
+      return Config.instance;
+   }
+
+   setListener(context: vscode.ExtensionContext): void {
+      if (this.hasSetListener) return;
       context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
-         Config.load();
-         Config._onDidChangeConfig.fire();
+         this.loadWorkspaceConfig();
+         this._onDidChangeConfig.fire();
       }));
    }
 
-   static load(): void {
-      this.config = vscode.workspace.getConfiguration(extensionName);
+   loadWorkspaceConfig(): void {
+      this.workspaceConfig = vscode.workspace.getConfiguration(extensionName);
    }
 
-   static get notesDir(): vscode.Uri | undefined {
-      const notesDir = this.config.get<string>('notesDir');
+   get notesDir(): vscode.Uri | undefined {
+      const notesDir = this.workspaceConfig.get<string>('notesDir');
       return notesDir ? vscode.Uri.file(notesDir) : undefined;
    }
 
-   static set notesDir(uri: vscode.Uri | undefined) {
-      this.config.update('notesDir', uri?.fsPath, vscode.ConfigurationTarget.Global);
-      Config._onDidChangeConfig.fire(Config.ConfigItem.notesDir);
+   set notesDir(uri: vscode.Uri | undefined) {
+      this.workspaceConfig.update('notesDir', uri?.fsPath, vscode.ConfigurationTarget.Global);
+      this._onDidChangeConfig.fire(Config.ConfigItem.notesDir);
    }
 
-   static get confirmDelete(): boolean {
-      return this.config.get('confirmDelete') ?? false;
+   get confirmDelete(): boolean {
+      return this.workspaceConfig.get('confirmDelete') ?? false;
    }
 
-   static set confirmDelete(confirm: boolean) {
-      this.config.update('confirmDelete', confirm, vscode.ConfigurationTarget.Global);
-      Config._onDidChangeConfig.fire(Config.ConfigItem.confirmDelete);
+   set confirmDelete(confirm: boolean) {
+      this.workspaceConfig.update('confirmDelete', confirm, vscode.ConfigurationTarget.Global);
+      this._onDidChangeConfig.fire(Config.ConfigItem.confirmDelete);
    }
 
-   static get previewEngine(): Config.PreviewEngine {
-      return this.config.get('previewEngine') ?? "default";
+   get previewEngine(): Config.PreviewEngine {
+      return this.workspaceConfig.get('previewEngine') ?? "default";
    }
 
-   static set previewEngine(engine: Config.PreviewEngine) {
-      this.config.update('previewEngine', engine, vscode.ConfigurationTarget.Global);
-      Config._onDidChangeConfig.fire(Config.ConfigItem.previewEngine);
+   set previewEngine(engine: Config.PreviewEngine) {
+      this.workspaceConfig.update('previewEngine', engine, vscode.ConfigurationTarget.Global);
+      this._onDidChangeConfig.fire(Config.ConfigItem.previewEngine);
    }
 
-   static get singlePreview(): boolean {
+   get singlePreview(): boolean {
       return vscode.workspace.getConfiguration('markdown-preview-enhanced').get('singlePreview') ?? true;
    }
 
-   static set singlePreview(singlePreview: boolean) {
+   set singlePreview(singlePreview: boolean) {
       vscode.workspace.getConfiguration('markdown-preview-enhanced').update('singlePreview', singlePreview, vscode.ConfigurationTarget.Global);
-      Config._onDidChangeConfig.fire(Config.ConfigItem.singlePreview);
+      this._onDidChangeConfig.fire(Config.ConfigItem.singlePreview);
    }
 
-   private static _displayMode: DisplayMode = DisplayMode.edit;
+   private _displayMode: DisplayMode = DisplayMode.edit;
 
-   static get displayMode(): DisplayMode {
-      return Config._displayMode;
+   get displayMode(): DisplayMode {
+      return this._displayMode;
    }
 
-   static set displayMode(mode: DisplayMode) {
-      Config._displayMode = mode;
-      Config._onDidChangeConfig.fire(Config.ConfigItem.displayMode);
+   set displayMode(mode: DisplayMode) {
+      this._displayMode = mode;
+      this._onDidChangeConfig.fire(Config.ConfigItem.displayMode);
    }
 
 }
@@ -84,5 +93,3 @@ export namespace Config {
    export type PreviewEngine = 'default' | 'enhanced';
 
 }
-
-Config.load();

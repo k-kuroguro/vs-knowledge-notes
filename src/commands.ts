@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { Config } from './config';
 import { extensionName } from './constants'
 
+const config = Config.getInstance();
+
 async function setNotesDir() {
    const selectedUris = await vscode.window.showOpenDialog({
       canSelectFiles: false,
@@ -9,11 +11,11 @@ async function setNotesDir() {
       canSelectMany: false,
    });
    if (!selectedUris) return;
-   Config.notesDir = selectedUris[0];
+   config.notesDir = selectedUris[0];
 }
 
 function toggleDisplayMode() {
-   Config.displayMode = !Config.displayMode;
+   config.displayMode = !config.displayMode;
 }
 
 export function registerCommands(context: vscode.ExtensionContext): void {
