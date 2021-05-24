@@ -80,7 +80,7 @@ export class NoteExplorer {
          this.treeView,
          vscode.workspace.registerFileSystemProvider(`${extensionName}.noteExplorer`, this.fileSystemProvider, { isCaseSensitive: true }),
          this.config.onDidChangeConfig(e => {
-            if (!e || e === Config.ConfigItem.notesDir) {
+            if (e && e.indexOf(Config.ConfigItem.notesDir) != -1) {
                this.treeDataProvider.refresh();
                this.updateWatcher();
             }

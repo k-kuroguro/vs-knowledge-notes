@@ -17,7 +17,7 @@ export class StatusBar {
       context.subscriptions.push(
          this.statusBarItem,
          this.config.onDidChangeConfig(e => {
-            if (e === Config.ConfigItem.displayMode) {
+            if (e && e.indexOf(Config.ConfigItem.displayMode) != -1) {
                this.update();
             }
          })
