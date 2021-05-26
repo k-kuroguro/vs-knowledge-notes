@@ -277,7 +277,7 @@
 				"simple-notes.notesDir": {
 					"type": "string",
 					"default": null,
-					"description": "Directory where notes are saved"
+					"description": "Directory where notes are saved."
 				},
 				"simple-notes.confirmDelete": {
 					"type": "boolean",
