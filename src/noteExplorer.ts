@@ -135,7 +135,7 @@ export class NoteExplorer {
             return undefined;
          }
       });
-      if (input && dirname) return input && dirname ? path.join(dirname.fsPath, input) : input;
+      return input && dirname ? path.join(dirname.fsPath, input) : input;
    }
 
    private async openFile(uri?: vscode.Uri): Promise<void> {
