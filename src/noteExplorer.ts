@@ -110,18 +110,18 @@ export class NoteExplorer {
 
    private registerCommands(context: vscode.ExtensionContext): void {
       context.subscriptions.push(
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.openFile`, (uri?) => this.openFile(uri)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.openFile`, (uri?: vscode.Uri) => this.openFile(uri)),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.refresh`, () => this.refresh()),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.newFile`, (file?) => this.createNewFile(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.newFolder`, (file?) => this.createNewFolder(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.findInFolder`, (file?) => this.findInFolder(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.cut`, (file?) => this.cut(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.copy`, (file?) => this.copy(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.paste`, (file?) => this.paste(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.copyPath`, (file?) => this.copyPath(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.copyRelativePath`, (file?) => this.copyRelativePath(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.rename`, (file?) => this.rename(file)),
-         vscode.commands.registerCommand(`${extensionName}.noteExplorer.delete`, (file?) => this.delete(file))
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.newFile`, (file?: File) => this.createNewFile(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.newFolder`, (file?: File) => this.createNewFolder(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.findInFolder`, (file?: File) => this.findInFolder(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.cut`, (file?: File) => this.cut(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.copy`, (file?: File) => this.copy(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.paste`, (file?: File) => this.paste(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.copyPath`, (file?: File) => this.copyPath(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.copyRelativePath`, (file?: File) => this.copyRelativePath(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.rename`, (file?: File) => this.rename(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.delete`, (file?: File) => this.delete(file))
       );
    }
 
