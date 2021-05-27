@@ -20,6 +20,7 @@ export class Config {
 
    setListener(context: vscode.ExtensionContext): void {
       if (this.hasSetListener) return;
+      this.hasSetListener = true;
       context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
          this.loadWorkspaceConfig();
          this._onDidChangeConfig.fire([Config.ConfigItem.notesDir, Config.ConfigItem.confirmDelete, Config.ConfigItem.previewEngine, Config.ConfigItem.singlePreview]);
