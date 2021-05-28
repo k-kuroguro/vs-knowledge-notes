@@ -106,7 +106,7 @@ export class NoteExplorer {
       }
    }
 
-   /* commands */
+   //#region commands
 
    private registerCommands(context: vscode.ExtensionContext): void {
       context.subscriptions.push(
@@ -290,5 +290,7 @@ export class NoteExplorer {
       }
       this.fileSystemProvider.delete(selectedFile.uri, { recursive: true });
    }
+
+   //#endregion
 
 }
