@@ -74,9 +74,6 @@ class FileStat implements vscode.FileStat {
 
 export class File extends vscode.TreeItem {
 
-	public readonly command?: vscode.Command;
-	public readonly contextValue: string;
-
 	constructor(
 		public readonly uri: vscode.Uri,
 		public readonly type: vscode.FileType
