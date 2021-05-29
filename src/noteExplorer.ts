@@ -5,6 +5,7 @@ import { FileAccess } from './fileAccess';
 import { Config } from './config';
 import { extensionName } from './constants';
 import { DisplayMode } from './types';
+import { isChild } from './utils';
 
 export class TreeDataProvider implements vscode.TreeDataProvider<File> {
 
@@ -250,8 +251,8 @@ export class NoteExplorer {
          }
       }
 
-      // check subdirectory
-      if (new RegExp(`^${clipboard.uri.fsPath.replace(/\\/g, '\\\\')}.*\\\\.*$`).test(filePath.fsPath)) {
+      //check subdirectory
+      if (isChild(clipboard.uri.fsPath, filePath.fsPath)) {
          vscode.window.showErrorMessage(`Cannot ${clipboard.cut ? 'cut' : 'copy'} "${clipboard.uri.fsPath}" to a subdirectory of itself, "${filePath.fsPath}".`);
          return;
       }
