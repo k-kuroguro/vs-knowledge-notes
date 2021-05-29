@@ -86,6 +86,20 @@ export class NoteExplorer {
                this.treeDataProvider.refresh();
                this.updateWatcher();
             }
+            if (e && e.indexOf(Config.ConfigItem.displayMode) != -1) {
+               // if activeEditor is file in notesDir, change file access
+               if (this.config.notesDir && vscode.window.activeTextEditor && isChild(this.config.notesDir.fsPath, vscode.window.activeTextEditor.document.fileName)) {
+                  if (this.config.displayMode === DisplayMode.edit) FileAccess.makeWritable(vscode.window.activeTextEditor.document.uri);
+                  else FileAccess.makeReadonly(vscode.window.activeTextEditor.document.uri)
+               }
+            }
+         }),
+         vscode.workspace.onDidChangeTextDocument(e => {
+            // if changed document is file in notesDir, change file access
+            if (this.config.notesDir && isChild(this.config.notesDir.fsPath, e.document.fileName)) {
+               if (this.config.displayMode === DisplayMode.edit) FileAccess.makeWritable(e.document.uri);
+               else FileAccess.makeReadonly(e.document.uri)
+            }
          }),
          this.fileSystemProvider.onDidChangeFile(() => {
             this.treeDataProvider.refresh();
