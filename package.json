@@ -120,10 +120,10 @@
 					"contextualTitle": "Note Explorer"
 				},
 				{
-					"id": "dummy",
-					"name": "dummy",
-					"icon": "$(files)",
-					"contextualTitle": "dummy"
+					"id": "simple-notes.tagView",
+					"name": "Tag View",
+					"icon": "$(tag)",
+					"contextualTitle": "Tag View"
 				}
 			]
 		},
@@ -313,6 +313,7 @@
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.11",
 		"@types/glob": "^7.1.3",
+		"@types/js-yaml": "^4.0.1",
 		"@types/mocha": "^8.0.4",
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.55.0",
@@ -328,6 +329,8 @@
 		"webpack-cli": "^4.4.0"
 	},
 	"dependencies": {
-		"fs-extra": "^9.1.0"
+		"fs-extra": "^9.1.0",
+		"gray-matter": "^4.0.3",
+		"vscode-ripgrep": "^1.11.3"
 	}
 }
