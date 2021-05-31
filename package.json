@@ -156,6 +156,16 @@
 				"view": "simple-notes.noteExplorer",
 				"contents": "Notes directory is empty.",
 				"when": "config.simple-notes.notesDir && simple-notes.isEmptyNotesDir"
+			},
+			{
+				"view": "simple-notes.tagView",
+				"contents": "Loading tags.",
+				"when": "config.simple-notes.notesDir && !simple-notes.isNothingTag"
+			},
+			{
+				"view": "simple-notes.tagView",
+				"contents": "Tag is nothing.",
+				"when": "!config.simple-notes.notesDir || simple-notes.isNothingTag"
 			}
 		],
 		"menus": {

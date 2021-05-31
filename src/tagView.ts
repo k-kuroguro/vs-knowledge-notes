@@ -53,7 +53,16 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
          return element.fileUris.map(uri => new File(uri, vscode.FileType.File, path.relative(this.config.notesDir.fsPath, uri.fsPath)));
       } else {
          if (!this.config.notesDir) return [];
+
          const matches = await rg(this.config.notesDir.fsPath, { multiline: true, regex: '---[\\s\\S]*?tags:[\\s\\S]*?---' });
+
+         if (!matches.length) {
+            await vscode.commands.executeCommand('setContext', `${extensionName}.isNothingTag`, true);
+            return [];
+         } else {
+            await vscode.commands.executeCommand('setContext', `${extensionName}.isNothingTag`, false);
+         }
+
          const results: Tag[] = [];
          for (const match of matches) {
             try {
