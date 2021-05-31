@@ -67,6 +67,11 @@
 			{
 				"command": "simple-notes.toggleDisplayMode",
 				"title": "Simple Notes: Toggle Display Mode"
+			},
+			{
+				"command": "simple-notes.tagView.refresh",
+				"title": "Refresh View",
+				"icon": "$(extensions-refresh)"
 			}
 		],
 		"keybindings": [
@@ -169,6 +174,11 @@
 					"command": "simple-notes.noteExplorer.newFile",
 					"when": "view == simple-notes.noteExplorer",
 					"group": "navigation"
+				},
+				{
+					"command": "simple-notes.tagView.refresh",
+					"when": "view == simple-notes.tagView",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
@@ -266,6 +276,10 @@
 				},
 				{
 					"command": "simple-notes.noteExplorer.delete",
+					"when": "false"
+				},
+				{
+					"command": "simple-notes.tagView.refresh",
 					"when": "false"
 				}
 			]

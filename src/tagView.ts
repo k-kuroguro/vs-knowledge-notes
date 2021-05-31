@@ -113,6 +113,8 @@ export class TagView {
             this.treeDataProvider.refresh();
          })
       );
+
+      this.registerCommands(context);
    }
 
    disposeWatcher(): void {
@@ -127,5 +129,19 @@ export class TagView {
          this.watcherDisposer = { dispose: () => { } }
       }
    }
+
+   //#region commands
+
+   private registerCommands(context: vscode.ExtensionContext): void {
+      context.subscriptions.push(
+         vscode.commands.registerCommand(`${extensionName}.tagView.refresh`, () => this.refresh())
+      );
+   }
+
+   private refresh(): void {
+      this.treeDataProvider.refresh();
+   }
+
+   //#endregion
 
 }
