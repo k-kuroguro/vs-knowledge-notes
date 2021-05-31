@@ -28,6 +28,7 @@ export class TreeDataProvider implements vscode.TreeDataProvider<File> {
       if (!this.config.notesDir) return [];
       if (!this.fileSystemProvider.exists(this.config.notesDir)) {
          vscode.window.showErrorMessage(`${this.config.notesDir.fsPath} is invalid path.`);
+         this.config.notesDir = undefined;
          return [];
       }
 
