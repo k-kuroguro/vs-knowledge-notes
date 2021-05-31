@@ -12,15 +12,11 @@ export class TreeDataProvider implements vscode.TreeDataProvider<File> {
    private _onDidChangeTreeData: vscode.EventEmitter<File | undefined | void> = new vscode.EventEmitter<File | undefined | void>();
    readonly onDidChangeTreeData: vscode.Event<File | undefined | void> = this._onDidChangeTreeData.event;
 
-   private notesDir?: vscode.Uri;
    private config: Config = Config.getInstance();
 
-   constructor(private readonly fileSystemProvider: FileSystemProvider) {
-      this.notesDir = this.config.notesDir;
-   }
+   constructor(private readonly fileSystemProvider: FileSystemProvider) { }
 
    refresh(): void {
-      this.notesDir = this.config.notesDir;
       this._onDidChangeTreeData.fire();
    }
 
@@ -29,9 +25,9 @@ export class TreeDataProvider implements vscode.TreeDataProvider<File> {
    }
 
    async getChildren(element?: File): Promise<File[]> {
-      if (!this.notesDir) return [];
-      if (!this.fileSystemProvider.exists(this.notesDir)) {
-         vscode.window.showErrorMessage(`${this.notesDir.fsPath} is invalid path.`);
+      if (!this.config.notesDir) return [];
+      if (!this.fileSystemProvider.exists(this.config.notesDir)) {
+         vscode.window.showErrorMessage(`${this.config.notesDir.fsPath} is invalid path.`);
          return [];
       }
 
@@ -46,7 +42,7 @@ export class TreeDataProvider implements vscode.TreeDataProvider<File> {
          return children.map(([name, type]) => new File(vscode.Uri.file(name), type));
       }
 
-      const children = await this.fileSystemProvider.readDirectory(this.notesDir);
+      const children = await this.fileSystemProvider.readDirectory(this.config.notesDir);
       children.sort((a, b) => {
          if (a[1] === b[1]) {
             return a[0].localeCompare(b[0]);
