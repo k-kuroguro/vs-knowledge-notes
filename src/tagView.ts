@@ -56,13 +56,6 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
          const matches = await rg(this.config.notesDir.fsPath, { multiline: true, regex: '---[\\s\\S]*?tags:[\\s\\S]*?---' });
 
-         if (!matches.length) {
-            await vscode.commands.executeCommand('setContext', `${extensionName}.isNothingTag`, true);
-            return [];
-         } else {
-            await vscode.commands.executeCommand('setContext', `${extensionName}.isNothingTag`, false);
-         }
-
          const results: Tag[] = [];
          for (const match of matches) {
             try {
@@ -86,6 +79,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                }
             }
          }
+         this.config.isNothingTag = !results.length;
          results.sort((x, y) => x.name.localeCompare(y.name));
          return results;
       }

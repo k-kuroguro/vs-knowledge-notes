@@ -51,8 +51,7 @@ export class TreeDataProvider implements vscode.TreeDataProvider<File> {
          return a[1] === vscode.FileType.Directory ? -1 : 1;
       });
 
-      if (!children.length) await vscode.commands.executeCommand('setContext', `${extensionName}.isEmptyNotesDir`, true);
-      else await vscode.commands.executeCommand('setContext', `${extensionName}.isEmptyNotesDir`, false);
+      this.config.isEmptyNotesDir = !children.length;
 
       return children.map(([name, type]) => new File(vscode.Uri.file(name), type));
    }

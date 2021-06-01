@@ -31,6 +31,8 @@ export class Config {
       this.workspaceConfig = vscode.workspace.getConfiguration(extensionName);
    }
 
+   //#region workspaceConfig
+
    get notesDir(): vscode.Uri | undefined {
       const notesDir = this.workspaceConfig.get<string>('notesDir');
       return notesDir ? vscode.Uri.file(notesDir) : undefined;
@@ -68,7 +70,11 @@ export class Config {
       this._onDidChangeConfig.fire([Config.ConfigItem.singlePreview]);
    }
 
+   //#endregion
+
    private _displayMode: DisplayMode = DisplayMode.edit;
+   private _isNothingTag: boolean = true;
+   private _isEmptyNotesDir: boolean = true;
 
    get displayMode(): DisplayMode {
       return this._displayMode;
@@ -77,6 +83,26 @@ export class Config {
    set displayMode(mode: DisplayMode) {
       this._displayMode = mode;
       this._onDidChangeConfig.fire([Config.ConfigItem.displayMode]);
+   }
+
+   get isNothingTag(): boolean {
+      return this._isNothingTag;
+   }
+
+   set isNothingTag(isNothing: boolean) {
+      this._isNothingTag = isNothing;
+      vscode.commands.executeCommand('setContext', `${extensionName}.isNothingTag`, isNothing);
+      this._onDidChangeConfig.fire([Config.ConfigItem.isNothingTag]);
+   }
+
+   get isEmptyNotesDir(): boolean {
+      return this._isEmptyNotesDir;
+   }
+
+   set isEmptyNotesDir(isEmpty: boolean) {
+      this._isEmptyNotesDir = isEmpty;
+      vscode.commands.executeCommand('setContext', `${extensionName}.isEmptyNotesDir`, isEmpty);
+      this._onDidChangeConfig.fire([Config.ConfigItem.isEmptyNotesDir]);
    }
 
 }
@@ -88,7 +114,9 @@ export namespace Config {
       confirmDelete: 2,
       previewEngine: 3,
       singlePreview: 4,
-      displayMode: 5
+      displayMode: 5,
+      isNothingTag: 6,
+      isEmptyNotesDir: 7
    } as const;
    export type ConfigItem = typeof ConfigItem[keyof typeof ConfigItem];
    export type ConfigItems = ConfigItem[];
