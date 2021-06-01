@@ -18,6 +18,10 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "simple-notes.setNotesDir",
+				"title": "Simple Notes: Set Notes Directory"
+			},
+			{
 				"command": "simple-notes.noteExplorer.refresh",
 				"title": "Refresh Explorer",
 				"icon": "$(extensions-refresh)"
