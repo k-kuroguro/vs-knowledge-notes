@@ -7,7 +7,7 @@ import { extensionName } from './constants';
 import { DisplayMode } from './types';
 import { isChild } from './utils';
 
-export class TreeDataProvider implements vscode.TreeDataProvider<File> {
+class TreeDataProvider implements vscode.TreeDataProvider<File> {
 
    private _onDidChangeTreeData: vscode.EventEmitter<File | undefined | void> = new vscode.EventEmitter<File | undefined | void>();
    readonly onDidChangeTreeData: vscode.Event<File | undefined | void> = this._onDidChangeTreeData.event;
