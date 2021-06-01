@@ -95,7 +95,6 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
 export class TagView {
 
-   private watcherDisposer: vscode.Disposable;
    private readonly treeDataProvider: TreeDataProvider;
    private readonly treeView: vscode.TreeView<TreeItem>;
    private readonly config: Config = Config.getInstance();
@@ -104,18 +103,11 @@ export class TagView {
       this.treeDataProvider = new TreeDataProvider();
       this.treeView = vscode.window.createTreeView(`${extensionName}.tagView`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
 
-      if (this.config.notesDir && this.fileSystemProvider.exists(this.config.notesDir)) {
-         this.watcherDisposer = this.fileSystemProvider.watch(this.config.notesDir, { recursive: true, excludes: [] });
-      } else {
-         this.watcherDisposer = { dispose: () => { } }
-      }
-
       context.subscriptions.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
             if (e && e.indexOf(Config.ConfigItem.notesDir) != -1) {
                this.treeDataProvider.refresh();
-               this.updateWatcher();
             }
          }),
          this.fileSystemProvider.onDidChangeFile(() => {
@@ -124,19 +116,6 @@ export class TagView {
       );
 
       this.registerCommands(context);
-   }
-
-   disposeWatcher(): void {
-      this.watcherDisposer.dispose();
-   }
-
-   private updateWatcher(): void {
-      this.watcherDisposer.dispose();
-      if (this.config.notesDir && this.fileSystemProvider.exists(this.config.notesDir)) {
-         this.watcherDisposer = this.fileSystemProvider.watch(this.config.notesDir, { recursive: true, excludes: [] });
-      } else {
-         this.watcherDisposer = { dispose: () => { } }
-      }
    }
 
    //#region commands

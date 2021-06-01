@@ -61,7 +61,6 @@ export class TreeDataProvider implements vscode.TreeDataProvider<File> {
 
 export class NoteExplorer {
 
-   private watcherDisposer: vscode.Disposable;
    private readonly treeDataProvider: TreeDataProvider;
    private readonly treeView: vscode.TreeView<File>;
    private readonly config: Config = Config.getInstance();
@@ -69,18 +68,12 @@ export class NoteExplorer {
    constructor(context: vscode.ExtensionContext, private readonly fileSystemProvider: FileSystemProvider) {
       this.treeDataProvider = new TreeDataProvider(fileSystemProvider);
       this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
-      if (this.config.notesDir && this.fileSystemProvider.exists(this.config.notesDir)) {
-         this.watcherDisposer = this.fileSystemProvider.watch(this.config.notesDir, { recursive: true, excludes: [] });
-      } else {
-         this.watcherDisposer = { dispose: () => { } }
-      }
 
       context.subscriptions.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
             if (e && e.indexOf(Config.ConfigItem.notesDir) != -1) {
                this.treeDataProvider.refresh();
-               this.updateWatcher();
             }
             if (e && e.indexOf(Config.ConfigItem.displayMode) != -1) {
                // if activeEditor is file in notesDir, change file access
@@ -103,19 +96,6 @@ export class NoteExplorer {
       );
 
       this.registerCommands(context);
-   }
-
-   disposeWatcher(): void {
-      this.watcherDisposer.dispose();
-   }
-
-   private updateWatcher(): void {
-      this.watcherDisposer.dispose();
-      if (this.config.notesDir && this.fileSystemProvider.exists(this.config.notesDir)) {
-         this.watcherDisposer = this.fileSystemProvider.watch(this.config.notesDir, { recursive: true, excludes: [] });
-      } else {
-         this.watcherDisposer = { dispose: () => { } }
-      }
    }
 
    //#region commands
