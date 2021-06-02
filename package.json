@@ -328,7 +328,12 @@
 						"enhanced",
 						"disuse"
 					],
-					"description": "The engine to use when displaying the preview."
+					"description": "The engine to use when displaying the preview.",
+					"enumDescriptions": [
+						"Use VSCode built-in engine.",
+						"Use markdown-preview-enhanced extension's engine.",
+						"Not display preview. Show file as readonly instead of preview."
+					]
 				}
 			}
 		}
