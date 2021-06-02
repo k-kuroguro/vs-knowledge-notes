@@ -7,6 +7,8 @@ import { extensionName } from './constants';
 import { DisplayMode } from './types';
 import { isChild } from './utils';
 
+type Clipboard = { uris: vscode.Uri[], cut: boolean };
+
 class TreeDataProvider implements vscode.TreeDataProvider<File> {
 
    private _onDidChangeTreeData: vscode.EventEmitter<File | undefined | void> = new vscode.EventEmitter<File | undefined | void>();
@@ -64,11 +66,11 @@ export class NoteExplorer {
    private readonly treeView: vscode.TreeView<File>;
    private readonly config: Config = Config.getInstance();
    private readonly disposables: vscode.Disposable[] = [];
-   private clipboard?: { uri: vscode.Uri, cut: boolean };
+   private clipboard?: Clipboard;
 
    constructor(private readonly fileSystemProvider: FileSystemProvider) {
       this.treeDataProvider = new TreeDataProvider(fileSystemProvider);
-      this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
+      this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.treeDataProvider, canSelectMany: true, showCollapseAll: true });
 
       this.disposables.push(
          this.treeView,
@@ -104,14 +106,6 @@ export class NoteExplorer {
       }
    }
 
-   setClipboard(uri?: vscode.Uri, cut?: boolean): void {
-      this.clipboard = (!uri || cut === undefined) ? undefined : { uri, cut };
-   }
-
-   getClipboard(): { uri: vscode.Uri, cut: boolean } | undefined {
-      return this.clipboard;
-   }
-
    //#region commands
 
    private registerCommands(): vscode.Disposable[] {
@@ -142,6 +136,14 @@ export class NoteExplorer {
          }
       });
       return input && dirname ? path.join(dirname.fsPath, input) : input;
+   }
+
+   private geSelectedFiles(rightClickedFile?: File): File[] | undefined {
+      if (!this.config.notesDir) return undefined;
+      if (!rightClickedFile) return this.treeView.selection.length ? this.treeView.selection : [new File(this.config.notesDir, vscode.FileType.Directory)];
+      if (!this.treeView.selection.length) return [rightClickedFile];
+      if (this.treeView.selection.findIndex(selectedFile => selectedFile.uri.fsPath == rightClickedFile.uri.fsPath) == -1) return [rightClickedFile];
+      else return this.treeView.selection;
    }
 
    private async openFile(uri?: vscode.Uri): Promise<void> {
@@ -204,68 +206,73 @@ export class NoteExplorer {
 
    private findInFolder(file?: File): void {
       if (!this.config.notesDir) return;
-      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(this.config.notesDir, vscode.FileType.Directory);
-      const dirname: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
+      const selectedFiles = this.geSelectedFiles(file);
+      if (!selectedFiles) return;
+      //@ts-ignore type inference of `this.config.notesDir` does not work.
+      const dirnames: string[] = selectedFiles.map(selectedFile => path.resolve(this.config.notesDir.fsPath, selectedFile.type === vscode.FileType.Directory ? selectedFile.uri.fsPath : path.dirname(selectedFile.uri.fsPath)));
       vscode.commands.executeCommand('workbench.action.findInFiles', {
          query: '',
          replace: '',
-         filesToInclude: path.resolve(this.config.notesDir.fsPath, dirname.fsPath),
+         filesToInclude: dirnames.join(','),
          filesToExclude: ""
       });
    }
 
    private cut(file?: File): void {
       if (!file && !this.treeView.selection.length) return;
-      const selectedFile: File = file ? file : this.treeView.selection[0];
-      this.setClipboard(selectedFile.uri, true);
+      const selectedUris: vscode.Uri[] = file ? [file.uri] : this.treeView.selection.map(file => file.uri);
+      this.clipboard = { uris: selectedUris, cut: true };
    }
 
    private copy(file?: File): void {
       if (!file && !this.treeView.selection.length) return;
-      const selectedFile: File = file ? file : this.treeView.selection[0];
-      this.setClipboard(selectedFile.uri, false);
+      const selectedUris: vscode.Uri[] = file ? [file.uri] : this.treeView.selection.map(file => file.uri);
+      this.clipboard = { uris: selectedUris, cut: false };
    }
 
    private paste(file?: File): void {
-      if (!file && !this.treeView.selection.length) return;
-      const selectedFile: File = file ? file : this.treeView.selection[0];
+      if (!this.config.notesDir) return;
+      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(this.config.notesDir, vscode.FileType.Directory);
 
-      const clipboard = this.getClipboard();
-      if (!clipboard) {
+      if (!this.clipboard) {
          vscode.window.showErrorMessage('Clipboard is empty.');
          return;
       }
 
-      const destParent = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri.fsPath : path.dirname(selectedFile.uri.fsPath);
-      const destExt = path.extname(clipboard.uri.fsPath);
-      const destBase = path.basename(clipboard.uri.fsPath, destExt);
-      let count = 1;
-      let filePath: vscode.Uri = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase}${destExt}`);
-      while (this.fileSystemProvider.exists(filePath)) {
-         if (count == 1) {
-            filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy${destExt}`);
-            count++;
-         } else {
-            filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy${count++}${destExt}`);
+      for (const uri of this.clipboard.uris) {
+         const destParent = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri.fsPath : path.dirname(selectedFile.uri.fsPath);
+         const destExt = path.extname(uri.fsPath);
+         const destBase = path.basename(uri.fsPath, destExt);
+         let count = 1;
+         let filePath: vscode.Uri = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase}${destExt}`);
+         while (this.fileSystemProvider.exists(filePath) && count <= 100) {
+            if (count == 1) {
+               filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy${destExt}`);
+               count++;
+            } else {
+               filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy${count++}${destExt}`);
+            }
          }
+
          if (count > 100) {
-            vscode.window.showErrorMessage('File named "{filename} copy n" has reached copying limit. Please delete these files.');
-            return;
+            vscode.window.showErrorMessage(`File named "${path.join(destParent), `${destBase} copy{n}${destExt}`}" has reached copying limit. Please delete these files.`);
+            continue;
+         }
+
+         //check subdirectory
+         if (isChild(uri.fsPath, filePath.fsPath)) {
+            vscode.window.showErrorMessage(`Cannot ${this.clipboard.cut ? 'cut' : 'copy'} "${uri.fsPath}" to a subdirectory of itself, "${filePath.fsPath}".`);
+            continue;
+         }
+
+         if (this.clipboard.cut) {
+            this.fileSystemProvider.move(uri, filePath, { overwrite: false });
+         } else {
+            this.fileSystemProvider.copy(uri, filePath, { overwrite: false });
          }
       }
 
-      //check subdirectory
-      if (isChild(clipboard.uri.fsPath, filePath.fsPath)) {
-         vscode.window.showErrorMessage(`Cannot ${clipboard.cut ? 'cut' : 'copy'} "${clipboard.uri.fsPath}" to a subdirectory of itself, "${filePath.fsPath}".`);
-         return;
-      }
-
-      if (clipboard.cut) {
-         this.fileSystemProvider.move(clipboard.uri, filePath, { overwrite: false });
-         this.setClipboard();
-      } else {
-         this.fileSystemProvider.copy(clipboard.uri, filePath, { overwrite: false });
-      }
+      if (this.clipboard.cut) this.clipboard = undefined;
    }
 
    private copyPath(file?: File): void {
@@ -294,13 +301,16 @@ export class NoteExplorer {
 
    private async delete(file?: File): Promise<void> {
       if (!file && !this.treeView.selection.length) return;
-      const selectedFile: File = file ? file : this.treeView.selection[0];
-      if (this.config.confirmDelete) {
-         const input = await vscode.window.showWarningMessage(`Are you sure you want to delete "${path.basename(selectedFile.uri.fsPath)}"?`, 'Delete', 'Cancel', 'Do not ask me again');
-         if (input == 'Cancel') return;
-         if (input == 'Do not ask me again') this.config.confirmDelete = false;
+      const selectedUris: vscode.Uri[] | undefined = this.geSelectedFiles(file)?.map(file => file.uri);
+      if (!selectedUris) return;
+      for (const uri of selectedUris) {
+         if (this.config.confirmDelete) {
+            const input = await vscode.window.showWarningMessage(`Are you sure you want to delete "${path.basename(uri.fsPath)}"?`, 'Delete', 'Cancel', 'Do not ask me again');
+            if (input == 'Cancel') return;
+            if (input == 'Do not ask me again') this.config.confirmDelete = false;
+         }
+         this.fileSystemProvider.delete(uri, { recursive: true });
       }
-      this.fileSystemProvider.delete(selectedFile.uri, { recursive: true });
    }
 
    //#endregion
