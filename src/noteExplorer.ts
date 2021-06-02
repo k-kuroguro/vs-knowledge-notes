@@ -228,15 +228,16 @@ export class NoteExplorer {
       }
 
       const destParent = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri.fsPath : path.dirname(selectedFile.uri.fsPath);
-      const destBase = path.basename(clipboard.uri.fsPath);
+      const destExt = path.extname(clipboard.uri.fsPath);
+      const destBase = path.basename(clipboard.uri.fsPath, destExt);
       let count = 1;
-      let filePath: vscode.Uri = vscode.Uri.joinPath(vscode.Uri.file(destParent), destBase);
+      let filePath: vscode.Uri = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase}${destExt}`);
       while (this.fileSystemProvider.exists(filePath)) {
          if (count == 1) {
-            filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy`);
+            filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy${destExt}`);
             count++;
          } else {
-            filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy ${count++}`);
+            filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy${count++}${destExt}`);
          }
          if (count > 100) {
             vscode.window.showErrorMessage('File named "{filename} copy n" has reached copying limit. Please delete these files.');
