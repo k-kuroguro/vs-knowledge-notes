@@ -18,9 +18,9 @@ function toggleDisplayMode() {
    config.displayMode = !config.displayMode;
 }
 
-export function registerCommands(context: vscode.ExtensionContext): void {
-   context.subscriptions.push(
+export function registerCommands(): vscode.Disposable[] {
+   return [
       vscode.commands.registerCommand(`${extensionName}.setNotesDir`, () => setNotesDir()),
       vscode.commands.registerCommand(`${extensionName}.toggleDisplayMode`, () => toggleDisplayMode())
-   );
+   ];
 }

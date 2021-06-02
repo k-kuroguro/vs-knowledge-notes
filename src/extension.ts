@@ -8,18 +8,18 @@ import { TagView } from './tagView';
 import { Watcher } from './watcher';
 
 export function activate(context: vscode.ExtensionContext) {
-	Config.getInstance().setListener(context);
 	const fileSystemProvider = new FileSystemProvider();
 	const watcher = Watcher.getInstance()
 	watcher.watch(fileSystemProvider);
-	new NoteExplorer(context, fileSystemProvider);
-	new TagView(context, fileSystemProvider);
-	new StatusBar(context);
 
-	context.subscriptions.push(watcher);
-
-	registerCommands(context);
+	context.subscriptions.push(
+		watcher,
+		Config.getInstance().setListener(),
+		new NoteExplorer(fileSystemProvider),
+		new StatusBar(),
+		new TagView(fileSystemProvider),
+		...registerCommands()
+	);
 }
 
-export function deactivate() {
-}
+export function deactivate() { }

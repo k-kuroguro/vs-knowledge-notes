@@ -63,12 +63,13 @@ export class NoteExplorer {
    private readonly treeDataProvider: TreeDataProvider;
    private readonly treeView: vscode.TreeView<File>;
    private readonly config: Config = Config.getInstance();
+   private readonly disposables: vscode.Disposable[] = [];
 
-   constructor(context: vscode.ExtensionContext, private readonly fileSystemProvider: FileSystemProvider) {
+   constructor(private readonly fileSystemProvider: FileSystemProvider) {
       this.treeDataProvider = new TreeDataProvider(fileSystemProvider);
       this.treeView = vscode.window.createTreeView(`${extensionName}.noteExplorer`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
 
-      context.subscriptions.push(
+      this.disposables.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
             if (e && e.indexOf(Config.ConfigItem.notesDir) != -1) {
@@ -91,16 +92,21 @@ export class NoteExplorer {
          }),
          this.fileSystemProvider.onDidChangeFile(() => {
             this.treeDataProvider.refresh();
-         })
+         }),
+         ...this.registerCommands()
       );
+   }
 
-      this.registerCommands(context);
+   dispose(): void {
+      for (const disposable of this.disposables) {
+         disposable.dispose();
+      }
    }
 
    //#region commands
 
-   private registerCommands(context: vscode.ExtensionContext): void {
-      context.subscriptions.push(
+   private registerCommands(): vscode.Disposable[] {
+      return [
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.openFile`, (uri?: vscode.Uri) => this.openFile(uri)),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.refresh`, () => this.refresh()),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.newFile`, (file?: File) => this.createNewFile(file)),
@@ -113,7 +119,7 @@ export class NoteExplorer {
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.copyRelativePath`, (file?: File) => this.copyRelativePath(file)),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.rename`, (file?: File) => this.rename(file)),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.delete`, (file?: File) => this.delete(file))
-      );
+      ];
    }
 
    private async showFileNameInputBox(dirname?: vscode.Uri): Promise<string | undefined> {

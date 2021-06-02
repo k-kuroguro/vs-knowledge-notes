@@ -92,12 +92,13 @@ export class TagView {
    private readonly treeDataProvider: TreeDataProvider;
    private readonly treeView: vscode.TreeView<TreeItem>;
    private readonly config: Config = Config.getInstance();
+   private readonly disposables: vscode.Disposable[] = [];
 
-   constructor(context: vscode.ExtensionContext, private readonly fileSystemProvider: FileSystemProvider) {
+   constructor(private readonly fileSystemProvider: FileSystemProvider) {
       this.treeDataProvider = new TreeDataProvider();
       this.treeView = vscode.window.createTreeView(`${extensionName}.tagView`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
 
-      context.subscriptions.push(
+      this.disposables.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
             if (e && e.indexOf(Config.ConfigItem.notesDir) != -1) {
@@ -106,18 +107,24 @@ export class TagView {
          }),
          this.fileSystemProvider.onDidChangeFile(() => {
             this.treeDataProvider.refresh();
-         })
+         }),
+         ...this.registerCommands()
       );
 
-      this.registerCommands(context);
+   }
+
+   dispose(): void {
+      for (const disposable of this.disposables) {
+         disposable.dispose();
+      }
    }
 
    //#region commands
 
-   private registerCommands(context: vscode.ExtensionContext): void {
-      context.subscriptions.push(
+   private registerCommands(): vscode.Disposable[] {
+      return [
          vscode.commands.registerCommand(`${extensionName}.tagView.refresh`, () => this.refresh())
-      );
+      ];
    }
 
    private refresh(): void {

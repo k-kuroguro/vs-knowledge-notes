@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import * as fs from "fs";
 import { extensionName } from "./constants";
 import { DisplayMode } from "./types";
 
@@ -18,13 +17,13 @@ export class Config {
       return Config.instance;
    }
 
-   setListener(context: vscode.ExtensionContext): void {
-      if (this.hasSetListener) return;
+   setListener(): vscode.Disposable {
+      if (this.hasSetListener) return { dispose: () => { } };
       this.hasSetListener = true;
-      context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
+      return vscode.workspace.onDidChangeConfiguration(() => {
          this.loadWorkspaceConfig();
          this._onDidChangeConfig.fire([Config.ConfigItem.notesDir, Config.ConfigItem.confirmDelete, Config.ConfigItem.previewEngine, Config.ConfigItem.singlePreview]);
-      }));
+      });
    }
 
    loadWorkspaceConfig(): void {
