@@ -117,8 +117,13 @@ export namespace Config {
       isNothingTag: 6,
       isEmptyNotesDir: 7
    } as const;
+   export const PreviewEngine = {
+      default: 'default',
+      enhanced: 'enhanced',
+      disuse: 'disuse'
+   } as const;
    export type ConfigItem = typeof ConfigItem[keyof typeof ConfigItem];
    export type ConfigItems = ConfigItem[];
-   export type PreviewEngine = 'default' | 'enhanced';
+   export type PreviewEngine = typeof PreviewEngine[keyof typeof PreviewEngine];
 
 }

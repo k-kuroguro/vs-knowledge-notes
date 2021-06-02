@@ -137,32 +137,30 @@ export class NoteExplorer {
 
    private async openFile(uri?: vscode.Uri): Promise<void> {
       if (!uri) return;
-      if (this.config.displayMode === DisplayMode.edit) {
-         FileAccess.makeWritable(uri);
+
+      const isEditMode = this.config.displayMode === DisplayMode.edit;
+      if (isEditMode) FileAccess.makeWritable(uri);
+      else FileAccess.makeReadonly(uri);
+
+      if (isEditMode || this.config.previewEngine === Config.PreviewEngine.disuse || path.extname(uri.fsPath) != '.md') {
          await vscode.commands.executeCommand('vscode.open', uri);
          await vscode.commands.executeCommand('workbench.action.focusSideBar');
          return;
       }
-      if (path.extname(uri.fsPath) == '.md') {
-         switch (this.config.previewEngine) {
-            case 'enhanced':
-               FileAccess.makeReadonly(uri);
-               await vscode.commands.executeCommand('vscode.open', uri);
-               await vscode.commands.executeCommand('markdown-preview-enhanced.openPreviewToTheSide', uri);
-               if (this.config.singlePreview) this.config.singlePreview = false; // allow multiple preview
-               break;
-            case 'default':
-            default:
-               await vscode.commands.executeCommand('markdown.showPreview', uri);
-               await vscode.commands.executeCommand('markdown.preview.toggleLock'); // allow multiple preview
-               break;
-         }
-         setTimeout(() => { vscode.commands.executeCommand('workbench.action.focusSideBar'); }, 300); // Focus tree view after rendering markdown
-      } else {
-         FileAccess.makeReadonly(uri);
-         await vscode.commands.executeCommand('vscode.open', uri);
-         await vscode.commands.executeCommand('workbench.action.focusSideBar');
+
+      switch (this.config.previewEngine) {
+         case 'enhanced':
+            await vscode.commands.executeCommand('vscode.open', uri);
+            await vscode.commands.executeCommand('markdown-preview-enhanced.openPreviewToTheSide', uri);
+            if (this.config.singlePreview) this.config.singlePreview = false; // allow multiple preview
+            break;
+         case 'default':
+         default:
+            await vscode.commands.executeCommand('markdown.showPreview', uri);
+            await vscode.commands.executeCommand('markdown.preview.toggleLock'); // allow multiple preview
+            break;
       }
+      await vscode.commands.executeCommand('workbench.action.focusSideBar');
    }
 
    private refresh(): void {

@@ -325,7 +325,8 @@
 					"default": "default",
 					"enum": [
 						"default",
-						"enhanced"
+						"enhanced",
+						"disuse"
 					],
 					"description": "The engine to use when displaying the preview."
 				}
