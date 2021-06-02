@@ -1,7 +1,7 @@
 {
 	"name": "simple-notes",
 	"displayName": "Simple Notes",
-	"description": "",
+	"description": "Extension for managing your notes simply",
 	"publisher": "k-kuroguro",
 	"version": "0.0.1",
 	"engines": {
@@ -11,6 +11,14 @@
 		"Other"
 	],
 	"license": "MIT",
+	"homepage": "https://github.com/k-kuroguro/simple-notes/blob/master/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/k-kuroguro/simple-notes.git"
+	},
+	"bugs": {
+		"url": "https://github.com/k-kuroguro/simple-notes/issues"
+	},
 	"activationEvents": [
 		"*"
 	],
