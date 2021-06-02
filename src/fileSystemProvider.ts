@@ -108,17 +108,7 @@ export class FileSystemProvider implements vscode.FileSystemProvider {
 	private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]> = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
 	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._onDidChangeFile.event;
 
-	private clipboard?: { uri: vscode.Uri, cut: boolean };
-
 	constructor() { }
-
-	setClipboard(uri?: vscode.Uri, cut?: boolean): void {
-		this.clipboard = (!uri || cut === undefined) ? undefined : { uri, cut };
-	}
-
-	getClipboard(): { uri: vscode.Uri, cut: boolean } | undefined {
-		return this.clipboard;
-	}
 
 	createDirectory(uri: vscode.Uri): Promise<void> {
 		return new Promise<void>((resolve, reject) => {

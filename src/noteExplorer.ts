@@ -64,6 +64,7 @@ export class NoteExplorer {
    private readonly treeView: vscode.TreeView<File>;
    private readonly config: Config = Config.getInstance();
    private readonly disposables: vscode.Disposable[] = [];
+   private clipboard?: { uri: vscode.Uri, cut: boolean };
 
    constructor(private readonly fileSystemProvider: FileSystemProvider) {
       this.treeDataProvider = new TreeDataProvider(fileSystemProvider);
@@ -101,6 +102,14 @@ export class NoteExplorer {
       for (const disposable of this.disposables) {
          disposable.dispose();
       }
+   }
+
+   setClipboard(uri?: vscode.Uri, cut?: boolean): void {
+      this.clipboard = (!uri || cut === undefined) ? undefined : { uri, cut };
+   }
+
+   getClipboard(): { uri: vscode.Uri, cut: boolean } | undefined {
+      return this.clipboard;
    }
 
    //#region commands
@@ -208,20 +217,20 @@ export class NoteExplorer {
    private cut(file?: File): void {
       if (!file && !this.treeView.selection.length) return;
       const selectedFile: File = file ? file : this.treeView.selection[0];
-      this.fileSystemProvider.setClipboard(selectedFile.uri, true);
+      this.setClipboard(selectedFile.uri, true);
    }
 
    private copy(file?: File): void {
       if (!file && !this.treeView.selection.length) return;
       const selectedFile: File = file ? file : this.treeView.selection[0];
-      this.fileSystemProvider.setClipboard(selectedFile.uri, false);
+      this.setClipboard(selectedFile.uri, false);
    }
 
    private paste(file?: File): void {
       if (!file && !this.treeView.selection.length) return;
       const selectedFile: File = file ? file : this.treeView.selection[0];
 
-      const clipboard = this.fileSystemProvider.getClipboard();
+      const clipboard = this.getClipboard();
       if (!clipboard) {
          vscode.window.showErrorMessage('Clipboard is empty.');
          return;
@@ -253,7 +262,7 @@ export class NoteExplorer {
 
       if (clipboard.cut) {
          this.fileSystemProvider.move(clipboard.uri, filePath, { overwrite: false });
-         this.fileSystemProvider.setClipboard();
+         this.setClipboard();
       } else {
          this.fileSystemProvider.copy(clipboard.uri, filePath, { overwrite: false });
       }
