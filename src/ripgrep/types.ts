@@ -1,4 +1,4 @@
-// This file is extracted from ripgrep-js (https://github.com/alexlafroscia/ripgrep-js).
+//This file is extracted from ripgrep-js (https://github.com/alexlafroscia/ripgrep-js).
 
 import { ExecException } from 'child_process';
 

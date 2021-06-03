@@ -20,7 +20,7 @@ export class Watcher {
    watch(fileSystemProvider: FileSystemProvider): void {
       this.fileSystemProvider = fileSystemProvider;
       this.disposables.event = this.config.onDidChangeConfig(e => {
-         if (e && e.indexOf(Config.ConfigItem.notesDir) != -1) this.update();
+         if (e && e.indexOf(Config.ConfigItem.notesDir) !== -1) this.update();
       });
       this.update();
    }

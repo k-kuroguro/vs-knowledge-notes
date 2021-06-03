@@ -62,8 +62,8 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                const tags: string[] | undefined = matter(match.submatches[0].match.text).data.tags;
                if (!tags) continue;
                for (const tag of tags) {
-                  const tagIndex = results.findIndex(r => r.name == tag);
-                  if (tagIndex == -1) {
+                  const tagIndex = results.findIndex(r => r.name === tag);
+                  if (tagIndex === -1) {
                      results.push(new Tag(tag, [vscode.Uri.file(match.path.text)]));
                      continue;
                   }
@@ -101,7 +101,7 @@ export class TagView {
       this.disposables.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
-            if (e && e.indexOf(Config.ConfigItem.notesDir) != -1) {
+            if (e && e.indexOf(Config.ConfigItem.notesDir) !== -1) {
                this.treeDataProvider.refresh();
             }
          }),

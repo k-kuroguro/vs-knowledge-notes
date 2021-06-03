@@ -1,6 +1,6 @@
-import * as vscode from "vscode";
-import { extensionName } from "./constants";
-import { DisplayMode } from "./types";
+import * as vscode from 'vscode';
+import { extensionName } from './constants';
+import { DisplayMode } from './types';
 
 export class Config {
 
@@ -52,7 +52,7 @@ export class Config {
    }
 
    get previewEngine(): Config.PreviewEngine {
-      return this.workspaceConfig.get('previewEngine') ?? "default";
+      return this.workspaceConfig.get('previewEngine') ?? 'default';
    }
 
    set previewEngine(engine: Config.PreviewEngine) {

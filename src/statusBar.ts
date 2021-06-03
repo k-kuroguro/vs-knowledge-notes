@@ -18,7 +18,7 @@ export class StatusBar {
       this.disposables.push(
          this.statusBarItem,
          this.config.onDidChangeConfig(e => {
-            if (e && e.indexOf(Config.ConfigItem.displayMode) != -1) {
+            if (e && e.indexOf(Config.ConfigItem.displayMode) !== -1) {
                this.update();
             }
          })

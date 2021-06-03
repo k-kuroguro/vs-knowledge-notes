@@ -1,11 +1,11 @@
-// This file is modified ripgrep-js (https://github.com/alexlafroscia/ripgrep-js) to use vscode-ripgrep.
+//This file is modified ripgrep-js (https://github.com/alexlafroscia/ripgrep-js) to use vscode-ripgrep.
 
 import { exec } from 'child_process';
 import * as path from 'path';
 import { RipGrepError, Match, Options } from './types';
 export * from './types';
 
-const rgPath = path.join(__dirname, "..", "node_modules", "vscode-ripgrep", "bin", "rg");
+const rgPath = path.join(__dirname, '..', 'node_modules', 'vscode-ripgrep', 'bin', 'rg');
 
 function formatResults(stdout: string): Match[] {
    stdout = stdout.trim();
@@ -70,7 +70,7 @@ export function ripGrep(cwd: string, optionsOrSearchTerm: Options | string): Pro
       execString = `${execString} --multiline`;
    }
 
-   execString = `${execString} ${cwd}`
+   execString = `${execString} ${cwd}`;
 
    return new Promise(function (resolve, reject) {
       exec(execString, (error, stdout, stderr) => {

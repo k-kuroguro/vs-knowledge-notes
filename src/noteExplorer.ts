@@ -75,22 +75,22 @@ export class NoteExplorer {
       this.disposables.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
-            if (e && e.indexOf(Config.ConfigItem.notesDir) != -1) {
+            if (e && e.indexOf(Config.ConfigItem.notesDir) !== -1) {
                this.treeDataProvider.refresh();
             }
-            if (e && e.indexOf(Config.ConfigItem.displayMode) != -1) {
-               // if activeEditor is file in notesDir, change file access
+            if (e && e.indexOf(Config.ConfigItem.displayMode) !== -1) {
+               //if activeEditor is file in notesDir, change file access
                if (this.config.notesDir && vscode.window.activeTextEditor && isChild(this.config.notesDir.fsPath, vscode.window.activeTextEditor.document.fileName)) {
                   if (this.config.displayMode === DisplayMode.edit) FileAccess.makeWritable(vscode.window.activeTextEditor.document.uri);
-                  else FileAccess.makeReadonly(vscode.window.activeTextEditor.document.uri)
+                  else FileAccess.makeReadonly(vscode.window.activeTextEditor.document.uri);
                }
             }
          }),
          vscode.workspace.onDidChangeTextDocument(e => {
-            // if changed document is file in notesDir, change file access
+            //if changed document is file in notesDir, change file access
             if (this.config.notesDir && isChild(this.config.notesDir.fsPath, e.document.fileName)) {
                if (this.config.displayMode === DisplayMode.edit) FileAccess.makeWritable(e.document.uri);
-               else FileAccess.makeReadonly(e.document.uri)
+               else FileAccess.makeReadonly(e.document.uri);
             }
          }),
          this.fileSystemProvider.onDidChangeFile(() => {
@@ -129,7 +129,7 @@ export class NoteExplorer {
       const input = await vscode.window.showInputBox({
          prompt: 'Enter a name for the file.',
          validateInput: value => {
-            if (value == '') return 'Please input any string.';
+            if (value === '') return 'Please input any string.';
             if (/[/\\:?*"<>|]/.test(value)) return 'File name may not contain /\\:?*"<>|';
             if (dirname && this.fileSystemProvider.exists(vscode.Uri.joinPath(dirname, value))) return `${value} is already exists.`;
             return undefined;
@@ -142,7 +142,7 @@ export class NoteExplorer {
       if (!this.config.notesDir) return undefined;
       if (!rightClickedFile) return this.treeView.selection.length ? this.treeView.selection : [new File(this.config.notesDir, vscode.FileType.Directory)];
       if (!this.treeView.selection.length) return [rightClickedFile];
-      if (this.treeView.selection.findIndex(selectedFile => selectedFile.uri.fsPath == rightClickedFile.uri.fsPath) == -1) return [rightClickedFile];
+      if (this.treeView.selection.findIndex(selectedFile => selectedFile.uri.fsPath === rightClickedFile.uri.fsPath) === -1) return [rightClickedFile];
       else return this.treeView.selection;
    }
 
@@ -153,7 +153,7 @@ export class NoteExplorer {
       if (isEditMode) FileAccess.makeWritable(uri);
       else FileAccess.makeReadonly(uri);
 
-      if (isEditMode || this.config.previewEngine === Config.PreviewEngine.disuse || path.extname(uri.fsPath) != '.md') {
+      if (isEditMode || this.config.previewEngine === Config.PreviewEngine.disuse || path.extname(uri.fsPath) !== '.md') {
          await vscode.commands.executeCommand('vscode.open', uri);
          await vscode.commands.executeCommand('workbench.action.focusSideBar');
          return;
@@ -163,12 +163,12 @@ export class NoteExplorer {
          case 'enhanced':
             await vscode.commands.executeCommand('vscode.open', uri);
             await vscode.commands.executeCommand('markdown-preview-enhanced.openPreviewToTheSide', uri);
-            if (this.config.singlePreview) this.config.singlePreview = false; // allow multiple preview
+            if (this.config.singlePreview) this.config.singlePreview = false; //allow multiple preview
             break;
          case 'default':
          default:
             await vscode.commands.executeCommand('markdown.showPreview', uri);
-            await vscode.commands.executeCommand('markdown.preview.toggleLock'); // allow multiple preview
+            await vscode.commands.executeCommand('markdown.preview.toggleLock'); //allow multiple preview
             break;
       }
       await vscode.commands.executeCommand('workbench.action.focusSideBar');
@@ -214,7 +214,7 @@ export class NoteExplorer {
          query: '',
          replace: '',
          filesToInclude: dirnames.join(','),
-         filesToExclude: ""
+         filesToExclude: ''
       });
    }
 
@@ -246,7 +246,7 @@ export class NoteExplorer {
          let count = 1;
          let filePath: vscode.Uri = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase}${destExt}`);
          while (this.fileSystemProvider.exists(filePath) && count <= 100) {
-            if (count == 1) {
+            if (count === 1) {
                filePath = vscode.Uri.joinPath(vscode.Uri.file(destParent), `${destBase} copy${destExt}`);
                count++;
             } else {
@@ -306,8 +306,8 @@ export class NoteExplorer {
       for (const uri of selectedUris) {
          if (this.config.confirmDelete) {
             const input = await vscode.window.showWarningMessage(`Are you sure you want to delete "${path.basename(uri.fsPath)}"?`, 'Delete', 'Cancel', 'Do not ask me again');
-            if (input == 'Cancel') return;
-            if (input == 'Do not ask me again') this.config.confirmDelete = false;
+            if (input === 'Cancel') return;
+            if (input === 'Do not ask me again') this.config.confirmDelete = false;
          }
          this.fileSystemProvider.delete(uri, { recursive: true });
       }

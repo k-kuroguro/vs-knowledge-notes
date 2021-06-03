@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Config } from './config';
-import { extensionName } from './constants'
+import { extensionName } from './constants';
 
 const config = Config.getInstance();
 
