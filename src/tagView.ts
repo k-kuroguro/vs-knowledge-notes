@@ -9,21 +9,47 @@ import { YAMLException } from 'js-yaml';
 
 class Tag extends vscode.TreeItem {
 
-   constructor(
-      public readonly name: string,
-      public readonly fileUris: vscode.Uri[]
-   ) {
-      super(name, vscode.TreeItemCollapsibleState.Collapsed);
+   static readonly delimiter: string = '/';
+   private readonly fileUris: Map<string, vscode.Uri> = new Map();
+   private readonly children: Map<string, Tag> = new Map();
 
-      this.tooltip = name;
+   constructor(
+      public label: string,
+      fileUris: vscode.Uri[] = [],
+      children: Tag[] = []
+   ) {
+      super(label, vscode.TreeItemCollapsibleState.Collapsed);
+
+      this.tooltip = label;
       this.description = false;
       this.contextValue = `${extensionName}.Tag`;
+      this.iconPath = {
+         light: path.join(__filename, '..', '..', 'resources', 'light', 'tag.svg'),
+         dark: path.join(__filename, '..', '..', 'resources', 'dark', 'tag.svg')
+      };
+      this.addFileUris(...fileUris);
+      this.addChildren(...children);
    }
 
-   iconPath = {
-      light: path.join(__filename, '..', '..', 'resources', 'light', 'tag.svg'),
-      dark: path.join(__filename, '..', '..', 'resources', 'dark', 'tag.svg')
-   };
+   getFileUris(): vscode.Uri[] {
+      return [...this.fileUris.values()];
+   }
+
+   addFileUris(...uris: vscode.Uri[]): void {
+      for (const uri of uris) {
+         this.fileUris.set(uri.fsPath, uri);
+      }
+   }
+
+   getChildren(): Tag[] {
+      return [...this.children.values()];
+   }
+
+   addChildren(...children: Tag[]): void {
+      for (const child of children) {
+         this.children.set(child.label, child);
+      }
+   }
 
 }
 
@@ -50,7 +76,15 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
       if (element) {
          if (!(element instanceof Tag) || !this.config.notesDir) return [];
          //@ts-ignore type inference of `this.config.notesDir` does not work.
-         return element.fileUris.map(uri => new File(uri, vscode.FileType.File, path.relative(this.config.notesDir.fsPath, uri.fsPath)));
+         const result: TreeItem[] = [...element.getFileUris().map(uri => new File(uri, vscode.FileType.File, path.relative(this.config.notesDir.fsPath, uri.fsPath)))];
+         const children = element.getChildren();
+         for (const child of children) {
+            const hasChild = child.label.indexOf('/') !== -1;
+            const children = hasChild ? [new Tag(child.label.split('/').slice(1).join('/'), child.getFileUris())] : [];
+            const label = child.label.split('/')[0];
+            result.push(new Tag(label, child.getFileUris(), children));
+         }
+         return result;
       } else {
          if (!this.config.notesDir) return [];
 
@@ -62,25 +96,28 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                const tags: string[] | undefined = matter(match.submatches[0].match.text).data.tags;
                if (!tags) continue;
                for (const tag of tags) {
-                  const tagIndex = results.findIndex(r => r.name === tag);
+                  const hasChild = tag.indexOf('/') !== -1;
+                  const children = hasChild ? [new Tag(tag.split('/').slice(1).join('/'), [vscode.Uri.file(match.path.text)])] : [];
+                  const tagLabel = tag.split('/')[0];
+                  const tagIndex = results.findIndex(r => r.label === tagLabel);
                   if (tagIndex === -1) {
-                     results.push(new Tag(tag, [vscode.Uri.file(match.path.text)]));
+                     results.push(new Tag(tagLabel, [vscode.Uri.file(match.path.text)], children));
                      continue;
                   }
-                  results[tagIndex].fileUris.push(vscode.Uri.file(match.path.text));
+                  results[tagIndex].addFileUris(vscode.Uri.file(match.path.text));
+                  results[tagIndex].addChildren(...children);
                }
             } catch (e: unknown) {
                if (e instanceof YAMLException) {
                   vscode.window.showErrorMessage(`Duplicated YAML front matter key in ${matches[0].path.text}`);
-                  continue;
                } else {
                   vscode.window.showErrorMessage(`${e} @ ${matches[0].path.text}`);
-                  continue;
                }
+               continue;
             }
          }
          this.config.isNothingTag = !results.length;
-         results.sort((x, y) => x.name.localeCompare(y.name));
+         results.sort((x, y) => x.label.localeCompare(y.label));
          return results;
       }
    }
