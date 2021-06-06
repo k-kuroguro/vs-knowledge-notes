@@ -9,7 +9,6 @@ import { YAMLException } from 'js-yaml';
 
 class Tag extends vscode.TreeItem {
 
-   static readonly delimiter: string = '/';
    private readonly fileUris: Map<string, vscode.Uri> = new Map();
    private readonly children: Map<string, Tag> = new Map();
 
@@ -121,7 +120,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
    }
 
    private parseTieredTag(label: string): [parent: string, child: string | undefined] {
-      return [label.split(Tag.delimiter)[0], label.indexOf('/') !== -1 ? label.split(Tag.delimiter).slice(1).join(Tag.delimiter) : undefined];
+      return [label.split(this.config.tagDelimiter)[0], label.indexOf(this.config.tagDelimiter) !== -1 ? label.split(this.config.tagDelimiter).slice(1).join(this.config.tagDelimiter) : undefined];
    }
 
    private pushUniqueTags(tagArray: Tag[], tag: Tag): Tag[];
@@ -156,7 +155,7 @@ export class TagView {
       this.disposables.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
-            if (e && e.indexOf(Config.ConfigItem.notesDir) !== -1) {
+            if (e && (e.indexOf(Config.ConfigItem.notesDir) !== -1 || e.indexOf(Config.ConfigItem.tagDelimiter) !== -1)) {
                this.treeDataProvider.refresh();
             }
          }),

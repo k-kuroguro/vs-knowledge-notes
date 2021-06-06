@@ -60,6 +60,15 @@ export class Config {
       this._onDidChangeConfig.fire([Config.ConfigItem.previewEngine]);
    }
 
+   get tagDelimiter(): string {
+      return this.workspaceConfig.get('tagDelimiter') ?? '/';
+   }
+
+   set tagDelimiter(delimiter: string) {
+      this.workspaceConfig.update('tagDelimiter', delimiter, vscode.ConfigurationTarget.Global);
+      this._onDidChangeConfig.fire([Config.ConfigItem.tagDelimiter]);
+   }
+
    get singlePreview(): boolean {
       return vscode.workspace.getConfiguration('markdown-preview-enhanced').get('singlePreview') ?? true;
    }
@@ -109,13 +118,14 @@ export class Config {
 export namespace Config {
 
    export const ConfigItem = {
-      notesDir: 1,
-      confirmDelete: 2,
-      previewEngine: 3,
-      singlePreview: 4,
-      displayMode: 5,
-      isNothingTag: 6,
-      isEmptyNotesDir: 7
+      notesDir: 'notesDir',
+      confirmDelete: 'confirmDelete',
+      previewEngine: 'previewEngine',
+      singlePreview: 'singlePreview',
+      tagDelimiter: 'tagDelimiter',
+      displayMode: 'displayMode',
+      isNothingTag: 'isNothingTag',
+      isEmptyNotesDir: 'isEmptyNotesDir'
    } as const;
    export const PreviewEngine = {
       default: 'default',

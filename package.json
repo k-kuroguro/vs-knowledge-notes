@@ -1,379 +1,384 @@
 {
-	"name": "simple-notes",
-	"displayName": "Simple Notes",
-	"description": "Extension for managing your notes simply",
-	"publisher": "k-kuroguro",
-	"version": "0.0.1",
-	"engines": {
-		"vscode": "^1.55.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"license": "MIT",
-	"homepage": "https://github.com/k-kuroguro/simple-notes/blob/master/README.md",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/k-kuroguro/simple-notes.git"
-	},
-	"bugs": {
-		"url": "https://github.com/k-kuroguro/simple-notes/issues"
-	},
-	"activationEvents": [
-		"*"
-	],
-	"main": "./dist/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "simple-notes.setNotesDir",
-				"title": "Simple Notes: Set Notes Directory"
-			},
-			{
-				"command": "simple-notes.noteExplorer.refresh",
-				"title": "Refresh Explorer",
-				"icon": "$(extensions-refresh)"
-			},
-			{
-				"command": "simple-notes.noteExplorer.newFile",
-				"title": "New File",
-				"icon": "$(new-file)"
-			},
-			{
-				"command": "simple-notes.noteExplorer.newFolder",
-				"title": "New Folder",
-				"icon": "$(new-folder)"
-			},
-			{
-				"command": "simple-notes.noteExplorer.findInFolder",
-				"title": "Find in Folder"
-			},
-			{
-				"command": "simple-notes.noteExplorer.cut",
-				"title": "Cut"
-			},
-			{
-				"command": "simple-notes.noteExplorer.copy",
-				"title": "Copy"
-			},
-			{
-				"command": "simple-notes.noteExplorer.paste",
-				"title": "Paste"
-			},
-			{
-				"command": "simple-notes.noteExplorer.copyPath",
-				"title": "Copy Path"
-			},
-			{
-				"command": "simple-notes.noteExplorer.copyRelativePath",
-				"title": "Copy Relative Path"
-			},
-			{
-				"command": "simple-notes.noteExplorer.rename",
-				"title": "Rename"
-			},
-			{
-				"command": "simple-notes.noteExplorer.delete",
-				"title": "Delete"
-			},
-			{
-				"command": "simple-notes.toggleDisplayMode",
-				"title": "Simple Notes: Toggle Display Mode"
-			},
-			{
-				"command": "simple-notes.tagView.refresh",
-				"title": "Refresh View",
-				"icon": "$(extensions-refresh)"
-			}
-		],
-		"keybindings": [
-			{
-				"command": "simple-notes.noteExplorer.findInFolder",
-				"key": "shift+alt+f",
-				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
-			},
-			{
-				"command": "simple-notes.noteExplorer.cut",
-				"key": "ctrl+x",
-				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
-			},
-			{
-				"command": "simple-notes.noteExplorer.copy",
-				"key": "ctrl+c",
-				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
-			},
-			{
-				"command": "simple-notes.noteExplorer.paste",
-				"key": "ctrl+v",
-				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
-			},
-			{
-				"command": "simple-notes.noteExplorer.copyPath",
-				"key": "shift+alt+c",
-				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
-			},
-			{
-				"command": "simple-notes.noteExplorer.copyRelativePath",
-				"key": "ctrl+shift+c",
-				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
-			},
-			{
-				"command": "simple-notes.noteExplorer.rename",
-				"key": "f2",
-				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
-			},
-			{
-				"command": "simple-notes.noteExplorer.delete",
-				"key": "delete",
-				"when": "focusedView == simple-notes.noteExplorer && !inputFocus"
-			}
-		],
-		"views": {
-			"simpleNotes": [
-				{
-					"id": "simple-notes.noteExplorer",
-					"name": "Note Explorer",
-					"icon": "$(files)",
-					"contextualTitle": "Note Explorer"
-				},
-				{
-					"id": "simple-notes.tagView",
-					"name": "Tag View",
-					"icon": "$(tag)",
-					"contextualTitle": "Tag View"
-				}
-			]
-		},
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "simpleNotes",
-					"title": "Simple Notes",
-					"icon": "$(notebook)"
-				}
-			]
-		},
-		"viewsWelcome": [
-			{
-				"view": "simple-notes.noteExplorer",
-				"contents": "No notes directory found.\n[Set Notes Directory](command:simple-notes.setNotesDir)",
-				"when": "!config.simple-notes.notesDir"
-			},
-			{
-				"view": "simple-notes.noteExplorer",
-				"contents": "Loading notes directory.",
-				"when": "config.simple-notes.notesDir && !simple-notes.isEmptyNotesDir"
-			},
-			{
-				"view": "simple-notes.noteExplorer",
-				"contents": "Notes directory is empty.",
-				"when": "config.simple-notes.notesDir && simple-notes.isEmptyNotesDir"
-			},
-			{
-				"view": "simple-notes.tagView",
-				"contents": "Loading tags.",
-				"when": "config.simple-notes.notesDir && !simple-notes.isNothingTag"
-			},
-			{
-				"view": "simple-notes.tagView",
-				"contents": "Tag is nothing.",
-				"when": "!config.simple-notes.notesDir || simple-notes.isNothingTag"
-			}
-		],
-		"menus": {
-			"view/title": [
-				{
-					"command": "simple-notes.noteExplorer.refresh",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "navigation"
-				},
-				{
-					"command": "simple-notes.noteExplorer.newFolder",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "navigation"
-				},
-				{
-					"command": "simple-notes.noteExplorer.newFile",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "navigation"
-				},
-				{
-					"command": "simple-notes.tagView.refresh",
-					"when": "view == simple-notes.tagView",
-					"group": "navigation"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "simple-notes.noteExplorer.newFile",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "1_creation@1"
-				},
-				{
-					"command": "simple-notes.noteExplorer.newFolder",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "1_creation@2"
-				},
-				{
-					"command": "simple-notes.noteExplorer.findInFolder",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "2_finding@1"
-				},
-				{
-					"command": "simple-notes.noteExplorer.cut",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "3_editing@1"
-				},
-				{
-					"command": "simple-notes.noteExplorer.copy",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "3_editing@2"
-				},
-				{
-					"command": "simple-notes.noteExplorer.paste",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "3_editing@3"
-				},
-				{
-					"command": "simple-notes.noteExplorer.copyPath",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "4_path@1"
-				},
-				{
-					"command": "simple-notes.noteExplorer.copyRelativePath",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "4_path@2"
-				},
-				{
-					"command": "simple-notes.noteExplorer.rename",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "5_modification@1"
-				},
-				{
-					"command": "simple-notes.noteExplorer.delete",
-					"when": "view == simple-notes.noteExplorer",
-					"group": "5_modification@2"
-				}
-			],
-			"commandPalette": [
-				{
-					"command": "simple-notes.noteExplorer.refresh",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.newFile",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.newFolder",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.findInFolder",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.cut",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.copy",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.paste",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.copyPath",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.copyRelativePath",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.rename",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.noteExplorer.delete",
-					"when": "false"
-				},
-				{
-					"command": "simple-notes.tagView.refresh",
-					"when": "false"
-				}
-			]
-		},
-		"configuration": {
-			"type": "object",
-			"title": "Simple Notes Configuration",
-			"properties": {
-				"simple-notes.notesDir": {
-					"type": "string",
-					"default": null,
-					"description": "Directory where notes are saved."
-				},
-				"simple-notes.confirmDelete": {
-					"type": "boolean",
-					"default": true,
-					"description": "Controls whether the explorer should ask for confirmation when deleting a file."
-				},
-				"simple-notes.previewEngine": {
-					"type": "string",
-					"default": "default",
-					"enum": [
-						"default",
-						"enhanced",
-						"disuse"
-					],
-					"description": "The engine to use when displaying the preview.",
-					"enumDescriptions": [
-						"Use VSCode built-in engine.",
-						"Use markdown-preview-enhanced extension's engine.",
-						"Not display preview. Show file as readonly instead of preview."
-					]
-				}
-			}
-		}
-	},
-	"extensionDependencies": [
-		"shd101wyy.markdown-preview-enhanced"
-	],
-	"scripts": {
-		"vscode:prepublish": "npm run package",
-		"compile": "webpack",
-		"watch": "webpack --watch",
-		"package": "webpack --mode production --devtool hidden-source-map",
-		"test-compile": "tsc -p ./",
-		"test-watch": "tsc -watch -p ./",
-		"pretest": "npm run test-compile && npm run lint",
-		"lint": "eslint src --ext ts",
-		"lint:fix": "eslint src --ext ts --fix",
-		"test": "node ./out/test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/fs-extra": "^9.0.11",
-		"@types/glob": "^7.1.3",
-		"@types/js-yaml": "^4.0.1",
-		"@types/mocha": "^8.0.4",
-		"@types/node": "^12.11.7",
-		"@types/vscode": "^1.55.0",
-		"@typescript-eslint/eslint-plugin": "^4.14.1",
-		"@typescript-eslint/parser": "^4.14.1",
-		"eslint": "^7.19.0",
-		"glob": "^7.1.6",
-		"mocha": "^8.2.1",
-		"ts-loader": "^8.0.14",
-		"typescript": "^4.1.3",
-		"vscode-test": "^1.5.0",
-		"webpack": "^5.19.0",
-		"webpack-cli": "^4.4.0"
-	},
-	"dependencies": {
-		"fs-extra": "^9.1.0",
-		"gray-matter": "^4.0.3",
-		"vscode-ripgrep": "^1.11.3"
-	}
+   "name": "simple-notes",
+   "displayName": "Simple Notes",
+   "description": "Extension for managing your notes simply",
+   "publisher": "k-kuroguro",
+   "version": "0.0.1",
+   "engines": {
+      "vscode": "^1.55.0"
+   },
+   "categories": [
+      "Other"
+   ],
+   "license": "MIT",
+   "homepage": "https://github.com/k-kuroguro/simple-notes/blob/master/README.md",
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/k-kuroguro/simple-notes.git"
+   },
+   "bugs": {
+      "url": "https://github.com/k-kuroguro/simple-notes/issues"
+   },
+   "activationEvents": [
+      "*"
+   ],
+   "main": "./dist/extension.js",
+   "contributes": {
+      "commands": [
+         {
+            "command": "simple-notes.setNotesDir",
+            "title": "Simple Notes: Set Notes Directory"
+         },
+         {
+            "command": "simple-notes.noteExplorer.refresh",
+            "title": "Refresh Explorer",
+            "icon": "$(extensions-refresh)"
+         },
+         {
+            "command": "simple-notes.noteExplorer.newFile",
+            "title": "New File",
+            "icon": "$(new-file)"
+         },
+         {
+            "command": "simple-notes.noteExplorer.newFolder",
+            "title": "New Folder",
+            "icon": "$(new-folder)"
+         },
+         {
+            "command": "simple-notes.noteExplorer.findInFolder",
+            "title": "Find in Folder"
+         },
+         {
+            "command": "simple-notes.noteExplorer.cut",
+            "title": "Cut"
+         },
+         {
+            "command": "simple-notes.noteExplorer.copy",
+            "title": "Copy"
+         },
+         {
+            "command": "simple-notes.noteExplorer.paste",
+            "title": "Paste"
+         },
+         {
+            "command": "simple-notes.noteExplorer.copyPath",
+            "title": "Copy Path"
+         },
+         {
+            "command": "simple-notes.noteExplorer.copyRelativePath",
+            "title": "Copy Relative Path"
+         },
+         {
+            "command": "simple-notes.noteExplorer.rename",
+            "title": "Rename"
+         },
+         {
+            "command": "simple-notes.noteExplorer.delete",
+            "title": "Delete"
+         },
+         {
+            "command": "simple-notes.toggleDisplayMode",
+            "title": "Simple Notes: Toggle Display Mode"
+         },
+         {
+            "command": "simple-notes.tagView.refresh",
+            "title": "Refresh View",
+            "icon": "$(extensions-refresh)"
+         }
+      ],
+      "keybindings": [
+         {
+            "command": "simple-notes.noteExplorer.findInFolder",
+            "key": "shift+alt+f",
+            "when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+         },
+         {
+            "command": "simple-notes.noteExplorer.cut",
+            "key": "ctrl+x",
+            "when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+         },
+         {
+            "command": "simple-notes.noteExplorer.copy",
+            "key": "ctrl+c",
+            "when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+         },
+         {
+            "command": "simple-notes.noteExplorer.paste",
+            "key": "ctrl+v",
+            "when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+         },
+         {
+            "command": "simple-notes.noteExplorer.copyPath",
+            "key": "shift+alt+c",
+            "when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+         },
+         {
+            "command": "simple-notes.noteExplorer.copyRelativePath",
+            "key": "ctrl+shift+c",
+            "when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+         },
+         {
+            "command": "simple-notes.noteExplorer.rename",
+            "key": "f2",
+            "when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+         },
+         {
+            "command": "simple-notes.noteExplorer.delete",
+            "key": "delete",
+            "when": "focusedView == simple-notes.noteExplorer && !inputFocus"
+         }
+      ],
+      "views": {
+         "simpleNotes": [
+            {
+               "id": "simple-notes.noteExplorer",
+               "name": "Note Explorer",
+               "icon": "$(files)",
+               "contextualTitle": "Note Explorer"
+            },
+            {
+               "id": "simple-notes.tagView",
+               "name": "Tag View",
+               "icon": "$(tag)",
+               "contextualTitle": "Tag View"
+            }
+         ]
+      },
+      "viewsContainers": {
+         "activitybar": [
+            {
+               "id": "simpleNotes",
+               "title": "Simple Notes",
+               "icon": "$(notebook)"
+            }
+         ]
+      },
+      "viewsWelcome": [
+         {
+            "view": "simple-notes.noteExplorer",
+            "contents": "No notes directory found.\n[Set Notes Directory](command:simple-notes.setNotesDir)",
+            "when": "!config.simple-notes.notesDir"
+         },
+         {
+            "view": "simple-notes.noteExplorer",
+            "contents": "Loading notes directory.",
+            "when": "config.simple-notes.notesDir && !simple-notes.isEmptyNotesDir"
+         },
+         {
+            "view": "simple-notes.noteExplorer",
+            "contents": "Notes directory is empty.",
+            "when": "config.simple-notes.notesDir && simple-notes.isEmptyNotesDir"
+         },
+         {
+            "view": "simple-notes.tagView",
+            "contents": "Loading tags.",
+            "when": "config.simple-notes.notesDir && !simple-notes.isNothingTag"
+         },
+         {
+            "view": "simple-notes.tagView",
+            "contents": "Tag is nothing.",
+            "when": "!config.simple-notes.notesDir || simple-notes.isNothingTag"
+         }
+      ],
+      "menus": {
+         "view/title": [
+            {
+               "command": "simple-notes.noteExplorer.refresh",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "navigation"
+            },
+            {
+               "command": "simple-notes.noteExplorer.newFolder",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "navigation"
+            },
+            {
+               "command": "simple-notes.noteExplorer.newFile",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "navigation"
+            },
+            {
+               "command": "simple-notes.tagView.refresh",
+               "when": "view == simple-notes.tagView",
+               "group": "navigation"
+            }
+         ],
+         "view/item/context": [
+            {
+               "command": "simple-notes.noteExplorer.newFile",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "1_creation@1"
+            },
+            {
+               "command": "simple-notes.noteExplorer.newFolder",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "1_creation@2"
+            },
+            {
+               "command": "simple-notes.noteExplorer.findInFolder",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "2_finding@1"
+            },
+            {
+               "command": "simple-notes.noteExplorer.cut",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "3_editing@1"
+            },
+            {
+               "command": "simple-notes.noteExplorer.copy",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "3_editing@2"
+            },
+            {
+               "command": "simple-notes.noteExplorer.paste",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "3_editing@3"
+            },
+            {
+               "command": "simple-notes.noteExplorer.copyPath",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "4_path@1"
+            },
+            {
+               "command": "simple-notes.noteExplorer.copyRelativePath",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "4_path@2"
+            },
+            {
+               "command": "simple-notes.noteExplorer.rename",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "5_modification@1"
+            },
+            {
+               "command": "simple-notes.noteExplorer.delete",
+               "when": "view == simple-notes.noteExplorer",
+               "group": "5_modification@2"
+            }
+         ],
+         "commandPalette": [
+            {
+               "command": "simple-notes.noteExplorer.refresh",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.newFile",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.newFolder",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.findInFolder",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.cut",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.copy",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.paste",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.copyPath",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.copyRelativePath",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.rename",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.noteExplorer.delete",
+               "when": "false"
+            },
+            {
+               "command": "simple-notes.tagView.refresh",
+               "when": "false"
+            }
+         ]
+      },
+      "configuration": {
+         "type": "object",
+         "title": "Simple Notes Configuration",
+         "properties": {
+            "simple-notes.notesDir": {
+               "type": "string",
+               "default": null,
+               "description": "Directory where notes are saved."
+            },
+            "simple-notes.confirmDelete": {
+               "type": "boolean",
+               "default": true,
+               "description": "Controls whether the explorer should ask for confirmation when deleting a file."
+            },
+            "simple-notes.previewEngine": {
+               "type": "string",
+               "default": "default",
+               "enum": [
+                  "default",
+                  "enhanced",
+                  "disuse"
+               ],
+               "description": "The engine to use when displaying the preview.",
+               "enumDescriptions": [
+                  "Use VSCode built-in engine.",
+                  "Use markdown-preview-enhanced extension's engine.",
+                  "Not display preview. Show file as readonly instead of preview."
+               ]
+            },
+            "simple-notes.tagDelimiter": {
+               "type": "string",
+               "default": "/",
+               "description": "A character to delimit tag."
+            }
+         }
+      }
+   },
+   "extensionDependencies": [
+      "shd101wyy.markdown-preview-enhanced"
+   ],
+   "scripts": {
+      "vscode:prepublish": "npm run package",
+      "compile": "webpack",
+      "watch": "webpack --watch",
+      "package": "webpack --mode production --devtool hidden-source-map",
+      "test-compile": "tsc -p ./",
+      "test-watch": "tsc -watch -p ./",
+      "pretest": "npm run test-compile && npm run lint",
+      "lint": "eslint src --ext ts",
+      "lint:fix": "eslint src --ext ts --fix",
+      "test": "node ./out/test/runTest.js"
+   },
+   "devDependencies": {
+      "@types/fs-extra": "^9.0.11",
+      "@types/glob": "^7.1.3",
+      "@types/js-yaml": "^4.0.1",
+      "@types/mocha": "^8.0.4",
+      "@types/node": "^12.11.7",
+      "@types/vscode": "^1.55.0",
+      "@typescript-eslint/eslint-plugin": "^4.14.1",
+      "@typescript-eslint/parser": "^4.14.1",
+      "eslint": "^7.19.0",
+      "glob": "^7.1.6",
+      "mocha": "^8.2.1",
+      "ts-loader": "^8.0.14",
+      "typescript": "^4.1.3",
+      "vscode-test": "^1.5.0",
+      "webpack": "^5.19.0",
+      "webpack-cli": "^4.4.0"
+   },
+   "dependencies": {
+      "fs-extra": "^9.1.0",
+      "gray-matter": "^4.0.3",
+      "vscode-ripgrep": "^1.11.3"
+   }
 }
