@@ -35,20 +35,22 @@ class Tag extends vscode.TreeItem {
       return [...this.fileUris.values()];
    }
 
-   addFileUris(...uris: vscode.Uri[]): void {
+   addFileUris(...uris: vscode.Uri[]): Tag {
       for (const uri of uris) {
          this.fileUris.set(uri.fsPath, uri);
       }
+      return this;
    }
 
    getChildren(): Tag[] {
       return [...this.children.values()];
    }
 
-   addChildren(...children: Tag[]): void {
+   addChildren(...children: Tag[]): Tag {
       for (const child of children) {
-         this.children.set(child.label, child);
+         this.children.set(child.label, this.children.get(child.label)?.addFileUris(...child.getFileUris()) ?? child);
       }
+      return this;
    }
 
 }
@@ -75,16 +77,12 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
    async getChildren(element?: TreeItem): Promise<TreeItem[]> {
       if (element) {
          if (!(element instanceof Tag) || !this.config.notesDir) return [];
-         //@ts-ignore type inference of `this.config.notesDir` does not work.
-         const result: TreeItem[] = [...element.getFileUris().map(uri => new File(uri, vscode.FileType.File, path.relative(this.config.notesDir.fsPath, uri.fsPath)))];
-         const children = element.getChildren();
-         for (const child of children) {
-            const hasChild = child.label.indexOf('/') !== -1;
-            const children = hasChild ? [new Tag(child.label.split('/').slice(1).join('/'), child.getFileUris())] : [];
-            const label = child.label.split('/')[0];
-            result.push(new Tag(label, child.getFileUris(), children));
+         const results: Tag[] = [];
+         for (const child of element.getChildren()) {
+            this.pushUniqueTags(results, child);
          }
-         return result;
+         //@ts-ignore type inference of `this.config.notesDir` does not work.
+         return this.sort([...results, ...element.getFileUris().map(uri => new File(uri, vscode.FileType.File, path.relative(this.config.notesDir.fsPath, uri.fsPath)))]);
       } else {
          if (!this.config.notesDir) return [];
 
@@ -93,19 +91,11 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
          const results: Tag[] = [];
          for (const match of matches) {
             try {
-               const tags: string[] | undefined = matter(match.submatches[0].match.text).data.tags;
-               if (!tags) continue;
-               for (const tag of tags) {
-                  const hasChild = tag.indexOf('/') !== -1;
-                  const children = hasChild ? [new Tag(tag.split('/').slice(1).join('/'), [vscode.Uri.file(match.path.text)])] : [];
-                  const tagLabel = tag.split('/')[0];
-                  const tagIndex = results.findIndex(r => r.label === tagLabel);
-                  if (tagIndex === -1) {
-                     results.push(new Tag(tagLabel, [vscode.Uri.file(match.path.text)], children));
-                     continue;
-                  }
-                  results[tagIndex].addFileUris(vscode.Uri.file(match.path.text));
-                  results[tagIndex].addChildren(...children);
+               const labels: string[] | undefined = matter(match.submatches[0].match.text).data.tags;
+               if (!labels) continue;
+               const fileUris = [vscode.Uri.file(match.path.text)];
+               for (const label of labels) {
+                  this.pushUniqueTags(results, label, fileUris);
                }
             } catch (e: unknown) {
                if (e instanceof YAMLException) {
@@ -117,9 +107,37 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
             }
          }
          this.config.isNothingTag = !results.length;
-         results.sort((x, y) => x.label.localeCompare(y.label));
-         return results;
+         return this.sort(results);;
       }
+   }
+
+   private sort(elements: TreeItem[]): TreeItem[] {
+      return elements.sort((x, y) => {
+         if (x instanceof Tag && y instanceof Tag || x instanceof File && y instanceof File) {
+            return x.label.localeCompare(y.label);
+         }
+         return x instanceof Tag ? -1 : 1;
+      });
+   }
+
+   private parseTieredTag(label: string): [parent: string, child: string | undefined] {
+      return [label.split(Tag.delimiter)[0], label.indexOf('/') !== -1 ? label.split(Tag.delimiter).slice(1).join(Tag.delimiter) : undefined];
+   }
+
+   private pushUniqueTags(tagArray: Tag[], tag: Tag): Tag[];
+   private pushUniqueTags(tagArray: Tag[], label: string, fileUris: vscode.Uri[]): Tag[];
+   private pushUniqueTags(tagArray: Tag[], tagOrLabel: Tag | string, fileUris?: vscode.Uri[]): Tag[] {
+      const [label, uris] = tagOrLabel instanceof Tag ? [tagOrLabel.label, tagOrLabel.getFileUris()] : [tagOrLabel, fileUris ?? []];
+      const [parentLabel, childLabel] = this.parseTieredTag(label);
+      const children = childLabel ? [new Tag(childLabel, uris)] : [];
+      const tagIndex = tagArray.findIndex(r => r.label === parentLabel);
+      if (tagIndex === -1) {
+         tagArray.push(new Tag(parentLabel, uris, children));
+      } else {
+         tagArray[tagIndex].addFileUris(...uris);
+         tagArray[tagIndex].addChildren(...children);
+      }
+      return tagArray;
    }
 
 }

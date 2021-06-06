@@ -75,11 +75,11 @@ class FileStat implements vscode.FileStat {
 export class File extends vscode.TreeItem {
 
    constructor(
-		public readonly uri: vscode.Uri,
-		public readonly type: vscode.FileType,
-		public readonly label?: string
+      public readonly uri: vscode.Uri,
+      public readonly type: vscode.FileType,
+      public readonly label: string = path.basename(uri.fsPath)
    ) {
-      super(label ?? path.basename(uri.fsPath), type === vscode.FileType.Directory ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
+      super(label, type === vscode.FileType.Directory ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
 
       this.resourceUri = uri;
       this.tooltip = uri.fsPath;
@@ -105,102 +105,102 @@ export class File extends vscode.TreeItem {
 
 export class FileSystemProvider implements vscode.FileSystemProvider {
 
-	private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]> = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
-	readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._onDidChangeFile.event;
+   private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]> = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
+   readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._onDidChangeFile.event;
 
-	constructor() { }
+   constructor() { }
 
-	createDirectory(uri: vscode.Uri): Promise<void> {
-	   return new Promise<void>((resolve, reject) => {
-	      fs.mkdir(uri.fsPath, { recursive: true }, error => Utils.handleResult(resolve, reject, error, undefined));
-	   });
-	}
+   createDirectory(uri: vscode.Uri): Promise<void> {
+      return new Promise<void>((resolve, reject) => {
+         fs.mkdir(uri.fsPath, { recursive: true }, error => Utils.handleResult(resolve, reject, error, undefined));
+      });
+   }
 
-	copy(source: vscode.Uri, destination: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
-	   return new Promise<void>((resolve, reject) => {
-	      fse.copy(source.fsPath, destination.fsPath, { overwrite: options.overwrite }, error => Utils.handleResult(resolve, reject, error, undefined));
-	   });
-	}
+   copy(source: vscode.Uri, destination: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
+      return new Promise<void>((resolve, reject) => {
+         fse.copy(source.fsPath, destination.fsPath, { overwrite: options.overwrite }, error => Utils.handleResult(resolve, reject, error, undefined));
+      });
+   }
 
-	delete(uri: vscode.Uri, options: { recursive: boolean }): Promise<void> {
-	   return new Promise<void>((resolve, reject) => {
-	      fs.rmdir(uri.fsPath, { recursive: options.recursive }, error => Utils.handleResult(resolve, reject, error, undefined));
-	   });
-	}
+   delete(uri: vscode.Uri, options: { recursive: boolean }): Promise<void> {
+      return new Promise<void>((resolve, reject) => {
+         fs.rmdir(uri.fsPath, { recursive: options.recursive }, error => Utils.handleResult(resolve, reject, error, undefined));
+      });
+   }
 
-	exists(uri: vscode.Uri): boolean {
-	   return fs.existsSync(uri.fsPath);
-	}
+   exists(uri: vscode.Uri): boolean {
+      return fs.existsSync(uri.fsPath);
+   }
 
-	move(source: vscode.Uri, destination: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
-	   return new Promise<void>((resolve, reject) => {
-	      fse.move(source.fsPath, destination.fsPath, { overwrite: options.overwrite }, error => Utils.handleResult(resolve, reject, error, undefined));
-	   });
-	}
+   move(source: vscode.Uri, destination: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
+      return new Promise<void>((resolve, reject) => {
+         fse.move(source.fsPath, destination.fsPath, { overwrite: options.overwrite }, error => Utils.handleResult(resolve, reject, error, undefined));
+      });
+   }
 
-	private async _readDirectory(uri: vscode.Uri): Promise<fs.Dirent[]> {
-	   return new Promise<fs.Dirent[]>((resolve, reject) => {
-	      fs.readdir(uri.fsPath, { withFileTypes: true }, (error, dirents) => Utils.handleResult(resolve, reject, error, dirents));
-	   });
-	}
+   private async _readDirectory(uri: vscode.Uri): Promise<fs.Dirent[]> {
+      return new Promise<fs.Dirent[]>((resolve, reject) => {
+         fs.readdir(uri.fsPath, { withFileTypes: true }, (error, dirents) => Utils.handleResult(resolve, reject, error, dirents));
+      });
+   }
 
-	readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
-	   return this._readDirectory(uri).then(dirents => {
-	      return dirents.map(dirent => [path.join(uri.fsPath, dirent.name), Utils.getFileType(dirent)]);
-	   });
-	}
+   readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
+      return this._readDirectory(uri).then(dirents => {
+         return dirents.map(dirent => [path.join(uri.fsPath, dirent.name), Utils.getFileType(dirent)]);
+      });
+   }
 
-	readFile(uri: vscode.Uri): Promise<Uint8Array> {
-	   return new Promise<Buffer>((resolve, reject) => {
-	      fs.readFile(uri.fsPath, (error, buffer) => Utils.handleResult(resolve, reject, error, buffer));
-	   });
-	}
+   readFile(uri: vscode.Uri): Promise<Uint8Array> {
+      return new Promise<Buffer>((resolve, reject) => {
+         fs.readFile(uri.fsPath, (error, buffer) => Utils.handleResult(resolve, reject, error, buffer));
+      });
+   }
 
-	rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
-	   const exists = this.exists(newUri);
-	   if (exists) {
-	      if (options.overwrite) this.delete(newUri, { recursive: true });
-	      else throw vscode.FileSystemError.FileExists();
-	   }
+   rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
+      const exists = this.exists(newUri);
+      if (exists) {
+         if (options.overwrite) this.delete(newUri, { recursive: true });
+         else throw vscode.FileSystemError.FileExists();
+      }
 
-	   const parentExists = this.exists(vscode.Uri.file(path.dirname(newUri.fsPath)));
-	   if (!parentExists) this.createDirectory(vscode.Uri.file(path.dirname(newUri.fsPath)));
+      const parentExists = this.exists(vscode.Uri.file(path.dirname(newUri.fsPath)));
+      if (!parentExists) this.createDirectory(vscode.Uri.file(path.dirname(newUri.fsPath)));
 
-	   return new Promise<void>((resolve, reject) => {
-	      fs.rename(oldUri.fsPath, newUri.fsPath, error => Utils.handleResult(resolve, reject, error, undefined));
-	   });
-	}
+      return new Promise<void>((resolve, reject) => {
+         fs.rename(oldUri.fsPath, newUri.fsPath, error => Utils.handleResult(resolve, reject, error, undefined));
+      });
+   }
 
-	stat(uri: vscode.Uri): Promise<vscode.FileStat> {
-	   return new Promise<vscode.FileStat>((resolve, reject) => {
-	      fs.stat(uri.fsPath, (error, stat) => Utils.handleResult(resolve, reject, error, new FileStat(stat)));
-	   });
-	}
+   stat(uri: vscode.Uri): Promise<vscode.FileStat> {
+      return new Promise<vscode.FileStat>((resolve, reject) => {
+         fs.stat(uri.fsPath, (error, stat) => Utils.handleResult(resolve, reject, error, new FileStat(stat)));
+      });
+   }
 
-	//HACK: exclude is unsupported
-	watch(uri: vscode.Uri, options: { excludes: string[], recursive: boolean }): vscode.Disposable {
-	   const watcher = fs.watch(uri.fsPath, { recursive: options.recursive }, async (event: string, fileName: string | Buffer) => {
-	      const filePath: vscode.Uri = vscode.Uri.joinPath(uri, fileName.toString());
-	      this._onDidChangeFile.fire([{
-	         type: event === 'change' ? vscode.FileChangeType.Changed : this.exists(filePath) ? vscode.FileChangeType.Created : vscode.FileChangeType.Deleted,
-	         uri: filePath
-	      } as vscode.FileChangeEvent]);
-	   });
-	   return { dispose: () => watcher.close() };
-	}
+   //HACK: exclude is unsupported
+   watch(uri: vscode.Uri, options: { excludes: string[], recursive: boolean }): vscode.Disposable {
+      const watcher = fs.watch(uri.fsPath, { recursive: options.recursive }, async (event: string, fileName: string | Buffer) => {
+         const filePath: vscode.Uri = vscode.Uri.joinPath(uri, fileName.toString());
+         this._onDidChangeFile.fire([{
+            type: event === 'change' ? vscode.FileChangeType.Changed : this.exists(filePath) ? vscode.FileChangeType.Created : vscode.FileChangeType.Deleted,
+            uri: filePath
+         } as vscode.FileChangeEvent]);
+      });
+      return { dispose: () => watcher.close() };
+   }
 
-	writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean, overwrite: boolean }): Promise<void> {
-	   const exists = this.exists(uri);
-	   if (exists) {
-	      if (!options.overwrite) throw vscode.FileSystemError.FileExists();
-	   } else {
-	      if (!options.create) throw vscode.FileSystemError.FileNotFound();
-	      this.createDirectory(vscode.Uri.file(path.dirname(uri.fsPath)));
-	   }
+   writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean, overwrite: boolean }): Promise<void> {
+      const exists = this.exists(uri);
+      if (exists) {
+         if (!options.overwrite) throw vscode.FileSystemError.FileExists();
+      } else {
+         if (!options.create) throw vscode.FileSystemError.FileNotFound();
+         this.createDirectory(vscode.Uri.file(path.dirname(uri.fsPath)));
+      }
 
-	   return new Promise<void>((resolve, reject) => {
-	      fs.writeFile(uri.fsPath, content, error => Utils.handleResult(resolve, reject, error, undefined));
-	   });
-	}
+      return new Promise<void>((resolve, reject) => {
+         fs.writeFile(uri.fsPath, content, error => Utils.handleResult(resolve, reject, error, undefined));
+      });
+   }
 
 }
