@@ -106,7 +106,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
             }
          }
          this.config.isNothingTag = !results.length;
-         return this.sort(results);;
+         return this.sort(results);
       }
    }
 
