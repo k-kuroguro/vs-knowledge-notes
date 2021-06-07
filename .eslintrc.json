@@ -55,6 +55,7 @@
       "semi": "off"
    },
    "ignorePatterns": [
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "*.config.js"
    ]
 }
