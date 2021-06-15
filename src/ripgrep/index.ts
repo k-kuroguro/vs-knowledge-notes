@@ -1,6 +1,6 @@
-//This file is modified ripgrep-js (https://github.com/alexlafroscia/ripgrep-js) to use vscode-ripgrep.
+//This file is modified ripgrep-js (https://github.com/alexlafroscia/ripgrep-js) to use vscode-ripgrep and execa.
 
-import { exec } from 'child_process';
+import * as execa from 'execa';
 import * as path from 'path';
 import { RipGrepError, Match, Options } from './types';
 export * from './types';
@@ -71,14 +71,11 @@ export function ripGrep(cwd: string, optionsOrSearchTerm: Options | string): Pro
    }
 
    execString = `${execString} ${cwd}`;
-
    return new Promise(function (resolve, reject) {
-      exec(execString, (error, stdout, stderr) => {
-         if (!error || (error && stderr === '')) {
-            resolve(formatResults(stdout));
-         } else {
-            reject(new RipGrepError(error, stderr));
-         }
-      });
+      try {
+         resolve(formatResults(execa.commandSync(execString).stdout));
+      } catch (e: any) {
+         reject(new RipGrepError(e));
+      }
    });
 }

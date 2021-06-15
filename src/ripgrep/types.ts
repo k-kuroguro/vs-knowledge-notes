@@ -1,6 +1,6 @@
 //This file is extracted from ripgrep-js (https://github.com/alexlafroscia/ripgrep-js).
 
-import { ExecException } from 'child_process';
+import { ExecaSyncError } from 'execa';
 
 type StringSearchOptions = {
    string: string;
@@ -42,13 +42,13 @@ export type RipGrepJsonMatch = {
 export type Match = RipGrepJsonMatch['data'];
 
 export class RipGrepError {
-   private error: ExecException;
+   private error: ExecaSyncError;
 
    stderr: string;
 
-   constructor(error: ExecException, stderr: string) {
+   constructor(error: ExecaSyncError) {
       this.error = error;
-      this.stderr = stderr;
+      this.stderr = error.stderr;
    }
 
    get message(): string {

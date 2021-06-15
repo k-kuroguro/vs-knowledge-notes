@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as matter from 'gray-matter';
-import { ripGrep as rg } from './ripgrep';
+import { ripGrep as rg, RipGrepError } from './ripgrep';
 import { Config } from './config';
 import { extensionName } from './constants';
 import { File, FileSystemProvider } from './fileSystemProvider';
@@ -85,10 +85,14 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
       } else {
          if (!this.config.notesDir) return [];
 
-         const matches = await rg(this.config.notesDir.fsPath, { multiline: true, regex: '---[\\s\\S]*?tags:[\\s\\S]*?---' });
+         const matches = await rg(
+            this.config.notesDir.fsPath, { multiline: true, regex: '---[\\s\\S]*?tags:[\\s\\S]*?---' }
+         ).catch((e: RipGrepError) => {
+            console.log(e);
+         });
 
          const results: Tag[] = [];
-         for (const match of matches) {
+         for (const match of matches ?? []) {
             try {
                const labels: string[] | undefined = matter(match.submatches[0].match.text).data.tags;
                if (!labels) continue;
@@ -98,9 +102,9 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                }
             } catch (e: unknown) {
                if (e instanceof YAMLException) {
-                  vscode.window.showErrorMessage(`Duplicated YAML front matter key in ${matches[0].path.text}`);
+                  vscode.window.showErrorMessage(`Duplicated YAML front matter key in ${match.path.text}`);
                } else {
-                  vscode.window.showErrorMessage(`${e} @ ${matches[0].path.text}`);
+                  vscode.window.showErrorMessage(`${e} @ ${match.path.text}`);
                }
                continue;
             }
