@@ -22,7 +22,7 @@ export class Config {
       this.hasSetListener = true;
       return vscode.workspace.onDidChangeConfiguration(() => {
          this.loadWorkspaceConfig();
-         this._onDidChangeConfig.fire([Config.ConfigItem.notesDir, Config.ConfigItem.confirmDelete, Config.ConfigItem.previewEngine, Config.ConfigItem.singlePreview]);
+         this._onDidChangeConfig.fire([Config.ConfigItem.NotesDir, Config.ConfigItem.ConfirmDelete, Config.ConfigItem.PreviewEngine, Config.ConfigItem.SinglePreview]);
       });
    }
 
@@ -39,7 +39,7 @@ export class Config {
 
    set notesDir(uri: vscode.Uri | undefined) {
       this.workspaceConfig.update('notesDir', uri?.fsPath, vscode.ConfigurationTarget.Global);
-      this._onDidChangeConfig.fire([Config.ConfigItem.notesDir]);
+      this._onDidChangeConfig.fire([Config.ConfigItem.NotesDir]);
    }
 
    get confirmDelete(): boolean {
@@ -48,7 +48,7 @@ export class Config {
 
    set confirmDelete(confirm: boolean) {
       this.workspaceConfig.update('confirmDelete', confirm, vscode.ConfigurationTarget.Global);
-      this._onDidChangeConfig.fire([Config.ConfigItem.confirmDelete]);
+      this._onDidChangeConfig.fire([Config.ConfigItem.ConfirmDelete]);
    }
 
    get previewEngine(): Config.PreviewEngine {
@@ -57,7 +57,7 @@ export class Config {
 
    set previewEngine(engine: Config.PreviewEngine) {
       this.workspaceConfig.update('previewEngine', engine, vscode.ConfigurationTarget.Global);
-      this._onDidChangeConfig.fire([Config.ConfigItem.previewEngine]);
+      this._onDidChangeConfig.fire([Config.ConfigItem.PreviewEngine]);
    }
 
    get tagDelimiter(): string {
@@ -66,7 +66,7 @@ export class Config {
 
    set tagDelimiter(delimiter: string) {
       this.workspaceConfig.update('tagDelimiter', delimiter, vscode.ConfigurationTarget.Global);
-      this._onDidChangeConfig.fire([Config.ConfigItem.tagDelimiter]);
+      this._onDidChangeConfig.fire([Config.ConfigItem.TagDelimiter]);
    }
 
    get singlePreview(): boolean {
@@ -75,12 +75,12 @@ export class Config {
 
    set singlePreview(singlePreview: boolean) {
       vscode.workspace.getConfiguration('markdown-preview-enhanced').update('singlePreview', singlePreview, vscode.ConfigurationTarget.Global);
-      this._onDidChangeConfig.fire([Config.ConfigItem.singlePreview]);
+      this._onDidChangeConfig.fire([Config.ConfigItem.SinglePreview]);
    }
 
    //#endregion
 
-   private _displayMode: DisplayMode = DisplayMode.edit;
+   private _displayMode: DisplayMode = DisplayMode.Edit;
    private _isNothingTag: boolean = true;
    private _isEmptyNotesDir: boolean = true;
 
@@ -90,7 +90,7 @@ export class Config {
 
    set displayMode(mode: DisplayMode) {
       this._displayMode = mode;
-      this._onDidChangeConfig.fire([Config.ConfigItem.displayMode]);
+      this._onDidChangeConfig.fire([Config.ConfigItem.DisplayMode]);
    }
 
    get isNothingTag(): boolean {
@@ -100,7 +100,7 @@ export class Config {
    set isNothingTag(isNothing: boolean) {
       this._isNothingTag = isNothing;
       vscode.commands.executeCommand('setContext', `${extensionName}.isNothingTag`, isNothing);
-      this._onDidChangeConfig.fire([Config.ConfigItem.isNothingTag]);
+      this._onDidChangeConfig.fire([Config.ConfigItem.IsNothingTag]);
    }
 
    get isEmptyNotesDir(): boolean {
@@ -110,7 +110,7 @@ export class Config {
    set isEmptyNotesDir(isEmpty: boolean) {
       this._isEmptyNotesDir = isEmpty;
       vscode.commands.executeCommand('setContext', `${extensionName}.isEmptyNotesDir`, isEmpty);
-      this._onDidChangeConfig.fire([Config.ConfigItem.isEmptyNotesDir]);
+      this._onDidChangeConfig.fire([Config.ConfigItem.IsEmptyNotesDir]);
    }
 
 }
@@ -118,19 +118,19 @@ export class Config {
 export namespace Config {
 
    export const ConfigItem = {
-      notesDir: 'notesDir',
-      confirmDelete: 'confirmDelete',
-      previewEngine: 'previewEngine',
-      singlePreview: 'singlePreview',
-      tagDelimiter: 'tagDelimiter',
-      displayMode: 'displayMode',
-      isNothingTag: 'isNothingTag',
-      isEmptyNotesDir: 'isEmptyNotesDir'
+      NotesDir: 'notesDir',
+      ConfirmDelete: 'confirmDelete',
+      PreviewEngine: 'previewEngine',
+      SinglePreview: 'singlePreview',
+      TagDelimiter: 'tagDelimiter',
+      DisplayMode: 'displayMode',
+      IsNothingTag: 'isNothingTag',
+      IsEmptyNotesDir: 'isEmptyNotesDir'
    } as const;
    export const PreviewEngine = {
-      default: 'default',
-      enhanced: 'enhanced',
-      disuse: 'disuse'
+      Default: 'default',
+      Enhanced: 'enhanced',
+      Disuse: 'disuse'
    } as const;
    export type ConfigItem = typeof ConfigItem[keyof typeof ConfigItem];
    export type ConfigItems = ConfigItem[];

@@ -1,5 +1,5 @@
 export const DisplayMode = {
-   view: true,
-   edit: false
+   View: true,
+   Edit: false
 } as const;
 export type DisplayMode = typeof DisplayMode[keyof typeof DisplayMode];

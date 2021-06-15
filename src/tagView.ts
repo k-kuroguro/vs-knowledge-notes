@@ -155,7 +155,7 @@ export class TagView {
       this.disposables.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
-            if (e && (e.indexOf(Config.ConfigItem.notesDir) !== -1 || e.indexOf(Config.ConfigItem.tagDelimiter) !== -1)) {
+            if (e && (e.indexOf(Config.ConfigItem.NotesDir) !== -1 || e.indexOf(Config.ConfigItem.TagDelimiter) !== -1)) {
                this.treeDataProvider.refresh();
             }
          }),

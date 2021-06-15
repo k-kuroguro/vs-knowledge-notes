@@ -75,13 +75,13 @@ export class NoteExplorer {
       this.disposables.push(
          this.treeView,
          this.config.onDidChangeConfig(e => {
-            if (e && e.indexOf(Config.ConfigItem.notesDir) !== -1) {
+            if (e && e.indexOf(Config.ConfigItem.NotesDir) !== -1) {
                this.treeDataProvider.refresh();
             }
-            if (e && e.indexOf(Config.ConfigItem.displayMode) !== -1) {
+            if (e && e.indexOf(Config.ConfigItem.DisplayMode) !== -1) {
                //if activeEditor is file in notesDir, change file access
                if (this.config.notesDir && vscode.window.activeTextEditor && isChild(this.config.notesDir.fsPath, vscode.window.activeTextEditor.document.fileName)) {
-                  if (this.config.displayMode === DisplayMode.edit) FileAccess.makeWritable(vscode.window.activeTextEditor.document.uri);
+                  if (this.config.displayMode === DisplayMode.Edit) FileAccess.makeWritable(vscode.window.activeTextEditor.document.uri);
                   else FileAccess.makeReadonly(vscode.window.activeTextEditor.document.uri);
                }
             }
@@ -89,7 +89,7 @@ export class NoteExplorer {
          vscode.workspace.onDidChangeTextDocument(e => {
             //if changed document is file in notesDir, change file access
             if (this.config.notesDir && isChild(this.config.notesDir.fsPath, e.document.fileName)) {
-               if (this.config.displayMode === DisplayMode.edit) FileAccess.makeWritable(e.document.uri);
+               if (this.config.displayMode === DisplayMode.Edit) FileAccess.makeWritable(e.document.uri);
                else FileAccess.makeReadonly(e.document.uri);
             }
          }),
@@ -149,11 +149,11 @@ export class NoteExplorer {
    private async openFile(uri?: vscode.Uri): Promise<void> {
       if (!uri) return;
 
-      const isEditMode = this.config.displayMode === DisplayMode.edit;
+      const isEditMode = this.config.displayMode === DisplayMode.Edit;
       if (isEditMode) FileAccess.makeWritable(uri);
       else FileAccess.makeReadonly(uri);
 
-      if (isEditMode || this.config.previewEngine === Config.PreviewEngine.disuse || path.extname(uri.fsPath) !== '.md') {
+      if (isEditMode || this.config.previewEngine === Config.PreviewEngine.Disuse || path.extname(uri.fsPath) !== '.md') {
          await vscode.commands.executeCommand('vscode.open', uri);
          await vscode.commands.executeCommand('workbench.action.focusSideBar');
          return;

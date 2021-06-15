@@ -11,14 +11,14 @@ export class StatusBar {
 
    constructor() {
       this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-      this.statusBarItem.text = this.config.displayMode === DisplayMode.edit ? '$(pencil) (Edit Mode)' : '$(book) (View Mode)';
+      this.statusBarItem.text = this.config.displayMode === DisplayMode.Edit ? '$(pencil) (Edit Mode)' : '$(book) (View Mode)';
       this.statusBarItem.command = `${extensionName}.toggleDisplayMode`;
       this.statusBarItem.show();
 
       this.disposables.push(
          this.statusBarItem,
          this.config.onDidChangeConfig(e => {
-            if (e && e.indexOf(Config.ConfigItem.displayMode) !== -1) {
+            if (e && e.indexOf(Config.ConfigItem.DisplayMode) !== -1) {
                this.update();
             }
          })
@@ -32,7 +32,7 @@ export class StatusBar {
    }
 
    private update(): void {
-      this.statusBarItem.text = this.config.displayMode === DisplayMode.edit ? '$(pencil) (Edit Mode)' : '$(book) (View Mode)';
+      this.statusBarItem.text = this.config.displayMode === DisplayMode.Edit ? '$(pencil) (Edit Mode)' : '$(book) (View Mode)';
    }
 
 }
