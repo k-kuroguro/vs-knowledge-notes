@@ -90,7 +90,7 @@
          {
             "command": "vs-knowledge-notes.noteExplorer.findInFolder",
             "key": "shift+alt+f",
-            "when": "focusedView == vs-knowledge-notes.noteExplorer && !inputFocus"
+            "when": "focusedView == vs-knowledge-notes.noteExplorer && !inputFocus && viewItem == vs-knowledge-notes.Directory"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.cut",
@@ -216,7 +216,7 @@
             },
             {
                "command": "vs-knowledge-notes.noteExplorer.findInFolder",
-               "when": "view == vs-knowledge-notes.noteExplorer",
+               "when": "view == vs-knowledge-notes.noteExplorer && viewItem == vs-knowledge-notes.Directory",
                "group": "2_finding@1"
             },
             {
