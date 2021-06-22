@@ -92,7 +92,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
          });
 
          const results: Tag[] = [];
-         for (const match of matches ?? []) {
+         for (const match of matches ? matches : []) {
             try {
                const labels: string[] | undefined = matter(match.submatches[0].match.text).data.tags;
                if (!labels) continue;
