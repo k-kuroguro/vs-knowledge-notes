@@ -27,62 +27,76 @@
       "commands": [
          {
             "command": "vs-knowledge-notes.setNotesDir",
-            "title": "VS Knowledge Notes: Set Notes Directory"
+            "category": "VS Knowledge Notes",
+            "title": "Set Notes Directory"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.refresh",
-            "title": "Refresh Explorer",
+            "category": "VS Knowledge Notes",
+            "title": "Refresh Note Explorer",
             "icon": "$(extensions-refresh)"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.newFile",
+            "category": "VS Knowledge Notes",
             "title": "New File",
             "icon": "$(new-file)"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.newFolder",
+            "category": "VS Knowledge Notes",
             "title": "New Folder",
             "icon": "$(new-folder)"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.findInFolder",
+            "category": "VS Knowledge Notes",
             "title": "Find in Folder"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.cut",
+            "category": "VS Knowledge Notes",
             "title": "Cut"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.copy",
+            "category": "VS Knowledge Notes",
             "title": "Copy"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.paste",
+            "category": "VS Knowledge Notes",
             "title": "Paste"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.copyPath",
+            "category": "VS Knowledge Notes",
             "title": "Copy Path"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.copyRelativePath",
+            "category": "VS Knowledge Notes",
             "title": "Copy Relative Path"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.rename",
+            "category": "VS Knowledge Notes",
             "title": "Rename"
          },
          {
             "command": "vs-knowledge-notes.noteExplorer.delete",
+            "category": "VS Knowledge Notes",
             "title": "Delete"
          },
          {
             "command": "vs-knowledge-notes.toggleDisplayMode",
-            "title": "VS Knowledge Notes: Toggle Display Mode"
+            "category": "VS Knowledge Notes",
+            "title": "Toggle Display Mode"
          },
          {
             "command": "vs-knowledge-notes.tagView.refresh",
-            "title": "Refresh View",
+            "category": "VS Knowledge Notes",
+            "title": "Refresh Tag View",
             "icon": "$(extensions-refresh)"
          }
       ],
@@ -257,18 +271,6 @@
          ],
          "commandPalette": [
             {
-               "command": "vs-knowledge-notes.noteExplorer.refresh",
-               "when": "false"
-            },
-            {
-               "command": "vs-knowledge-notes.noteExplorer.newFile",
-               "when": "false"
-            },
-            {
-               "command": "vs-knowledge-notes.noteExplorer.newFolder",
-               "when": "false"
-            },
-            {
                "command": "vs-knowledge-notes.noteExplorer.findInFolder",
                "when": "false"
             },
@@ -298,10 +300,6 @@
             },
             {
                "command": "vs-knowledge-notes.noteExplorer.delete",
-               "when": "false"
-            },
-            {
-               "command": "vs-knowledge-notes.tagView.refresh",
                "when": "false"
             }
          ]
