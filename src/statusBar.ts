@@ -5,18 +5,19 @@ import { DisplayMode } from './types';
 
 export class StatusBar {
 
-   private statusBarItem: vscode.StatusBarItem;
+   private viewModeSign: vscode.StatusBarItem;
    private readonly config: Config = Config.getInstance();
    private readonly disposables: vscode.Disposable[] = [];
 
    constructor() {
-      this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-      this.statusBarItem.text = this.config.displayMode === DisplayMode.Edit ? '$(pencil) (Edit Mode)' : '$(book) (View Mode)';
-      this.statusBarItem.command = `${extensionName}.toggleDisplayMode`;
-      this.statusBarItem.show();
+      this.viewModeSign = vscode.window.createStatusBarItem(`${extensionName}.statusBar.viewModeSign`, vscode.StatusBarAlignment.Left);
+      this.viewModeSign.text = this.config.displayMode === DisplayMode.Edit ? '$(pencil) (Edit Mode)' : '$(book) (View Mode)';
+      this.viewModeSign.command = `${extensionName}.toggleDisplayMode`;
+      this.viewModeSign.name = 'View Mode';
+      this.viewModeSign.show();
 
       this.disposables.push(
-         this.statusBarItem,
+         this.viewModeSign,
          this.config.onDidChangeConfig(e => {
             if (e && e.indexOf(Config.ConfigItem.DisplayMode) !== -1) {
                this.update();
@@ -32,7 +33,7 @@ export class StatusBar {
    }
 
    private update(): void {
-      this.statusBarItem.text = this.config.displayMode === DisplayMode.Edit ? '$(pencil) (Edit Mode)' : '$(book) (View Mode)';
+      this.viewModeSign.text = this.config.displayMode === DisplayMode.Edit ? '$(pencil) (Edit Mode)' : '$(book) (View Mode)';
    }
 
 }
