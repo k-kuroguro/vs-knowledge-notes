@@ -142,7 +142,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
 }
 
-export class TagView {
+export class TagExplorer {
 
    private readonly treeDataProvider: TreeDataProvider;
    private readonly treeView: vscode.TreeView<TreeItem>;
@@ -151,7 +151,7 @@ export class TagView {
 
    constructor(private readonly fileSystemProvider: FileSystemProvider) {
       this.treeDataProvider = new TreeDataProvider();
-      this.treeView = vscode.window.createTreeView(`${extensionName}.tagView`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
+      this.treeView = vscode.window.createTreeView(`${extensionName}.tagExplorer`, { treeDataProvider: this.treeDataProvider, showCollapseAll: true });
 
       this.disposables.push(
          this.treeView,
@@ -178,7 +178,7 @@ export class TagView {
 
    private registerCommands(): vscode.Disposable[] {
       return [
-         vscode.commands.registerCommand(`${extensionName}.tagView.refresh`, () => this.refresh())
+         vscode.commands.registerCommand(`${extensionName}.tagExplorer.refresh`, () => this.refresh())
       ];
    }
 

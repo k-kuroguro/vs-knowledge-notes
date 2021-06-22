@@ -94,9 +94,9 @@
             "title": "Toggle Display Mode"
          },
          {
-            "command": "vs-knowledge-notes.tagView.refresh",
+            "command": "vs-knowledge-notes.tagExplorer.refresh",
             "category": "VS Knowledge Notes",
-            "title": "Refresh Tag View",
+            "title": "Refresh Tag Explorer",
             "icon": "$(extensions-refresh)"
          }
       ],
@@ -151,10 +151,10 @@
                "contextualTitle": "Note Explorer"
             },
             {
-               "id": "vs-knowledge-notes.tagView",
-               "name": "Tag View",
+               "id": "vs-knowledge-notes.tagExplorer",
+               "name": "Tag Explorer",
                "icon": "$(tag)",
-               "contextualTitle": "Tag View"
+               "contextualTitle": "Tag Explorer"
             }
          ]
       },
@@ -184,12 +184,12 @@
             "when": "config.vs-knowledge-notes.notesDir && vs-knowledge-notes.isEmptyNotesDir"
          },
          {
-            "view": "vs-knowledge-notes.tagView",
+            "view": "vs-knowledge-notes.tagExplorer",
             "contents": "Loading tags.",
             "when": "config.vs-knowledge-notes.notesDir && !vs-knowledge-notes.isNothingTag"
          },
          {
-            "view": "vs-knowledge-notes.tagView",
+            "view": "vs-knowledge-notes.tagExplorer",
             "contents": "Tag is nothing.",
             "when": "!config.vs-knowledge-notes.notesDir || vs-knowledge-notes.isNothingTag"
          }
@@ -212,8 +212,8 @@
                "group": "navigation"
             },
             {
-               "command": "vs-knowledge-notes.tagView.refresh",
-               "when": "view == vs-knowledge-notes.tagView",
+               "command": "vs-knowledge-notes.tagExplorer.refresh",
+               "when": "view == vs-knowledge-notes.tagExplorer",
                "group": "navigation"
             }
          ],

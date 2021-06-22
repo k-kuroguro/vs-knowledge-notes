@@ -4,7 +4,7 @@ import { registerCommands } from './commands';
 import { Config } from './config';
 import { StatusBar } from './statusBar';
 import { FileSystemProvider } from './fileSystemProvider';
-import { TagView } from './tagView';
+import { TagExplorer } from './tagExplorer';
 import { Watcher } from './watcher';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
       Config.getInstance().setListener(),
       new NoteExplorer(fileSystemProvider),
       new StatusBar(),
-      new TagView(fileSystemProvider),
+      new TagExplorer(fileSystemProvider),
       ...registerCommands()
    );
 }
