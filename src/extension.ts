@@ -6,6 +6,7 @@ import { StatusBar } from './statusBar';
 import { FileSystemProvider } from './fileSystemProvider';
 import { TagExplorer } from './tagExplorer';
 import { Watcher } from './watcher';
+import { Search } from './search';
 
 export function activate(context: vscode.ExtensionContext) {
    const fileSystemProvider = new FileSystemProvider();
@@ -18,6 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
       new NoteExplorer(fileSystemProvider),
       new StatusBar(),
       new TagExplorer(fileSystemProvider),
+      new Search(),
       ...registerCommands()
    );
 }

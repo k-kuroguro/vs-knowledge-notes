@@ -98,6 +98,11 @@
             "category": "VS Knowledge Notes",
             "title": "Refresh Tag Explorer",
             "icon": "$(extensions-refresh)"
+         },
+         {
+            "command": "vs-knowledge-notes.searchInNotes",
+            "category": "VS Knowledge Notes",
+            "title": "Search In Notes"
          }
       ],
       "keybindings": [

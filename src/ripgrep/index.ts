@@ -1,6 +1,6 @@
-//This file is modified ripgrep-js (https://github.com/alexlafroscia/ripgrep-js) to use vscode-ripgrep and execa.
+//This file is modified ripgrep-js (https://github.com/alexlafroscia/ripgrep-js) to use vscode-ripgrep.
 
-import * as execa from 'execa';
+import { execFile } from 'child_process';
 import * as path from 'path';
 import { RipGrepError, Match, Options } from './types';
 export * from './types';
@@ -43,12 +43,8 @@ export function ripGrep(cwd: string, optionsOrSearchTerm: Options | string): Pro
       return Promise.reject(new Error('No search term provided'));
    }
 
-   let execString = `${rgPath} --json`;
-   if ('regex' in options) {
-      execString = `${execString} -e ${options.regex}`;
-   } else if ('string' in options) {
-      execString = `${execString} -F ${options.string}`;
-   }
+   const command = rgPath;
+   const execArgs = ['--json'];
 
    if (options.fileType) {
       if (!Array.isArray(options.fileType)) {
@@ -56,26 +52,43 @@ export function ripGrep(cwd: string, optionsOrSearchTerm: Options | string): Pro
       }
 
       for (const fileType of options.fileType) {
-         execString = `${execString} -t ${fileType}`;
+         execArgs.push('-t', fileType);
       }
    }
 
    if (options.globs) {
-      execString = options.globs.reduce((command, glob) => {
-         return `${command} -g '${glob}'`;
-      }, execString);
+      for (const glob of options.globs) {
+         execArgs.push('-g', glob);
+      }
    }
 
    if (options.multiline) {
-      execString = `${execString} --multiline`;
+      execArgs.push('--multiline');
    }
 
-   execString = `${execString} ${cwd}`;
+   if (!options.matchCase) {
+      execArgs.push('-i');
+   }
+
+   if (options.matchWholeWord) {
+      execArgs.push('-w');
+   }
+
+   if ('regex' in options) {
+      execArgs.push('-e', `${options.regex}`);
+   } else if ('string' in options) {
+      execArgs.push('-F', '--', `${options.string}`);
+   }
+
+   execArgs.push(cwd);
+
    return new Promise(function (resolve, reject) {
-      try {
-         resolve(formatResults(execa.commandSync(execString).stdout));
-      } catch (e: any) {
-         reject(new RipGrepError(e));
-      }
+      execFile(command, execArgs, (error, stdout, stderr) => {
+         if (!error || (error && stderr === '')) {
+            resolve(formatResults(stdout));
+         } else {
+            reject(new RipGrepError(error, stderr));
+         }
+      });
    });
 }
