@@ -8,7 +8,7 @@ export class FileAccess {
       try {
          fs.accessSync(uri.fsPath, fs.constants.W_OK);
          return false;
-      } catch (error) {
+      } catch {
          return true;
       }
    }
