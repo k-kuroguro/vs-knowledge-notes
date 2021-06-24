@@ -125,8 +125,9 @@ export class NoteExplorer {
       ];
    }
 
-   private async showFileNameInputBox(dirname?: vscode.Uri): Promise<string | undefined> {
+   private async showFileNameInputBox(dirname?: vscode.Uri, initialValue?: string): Promise<string | undefined> {
       const input = await vscode.window.showInputBox({
+         value: initialValue,
          prompt: 'Enter a name for the file.',
          validateInput: value => {
             if (value === '') return 'Please input any string.';
@@ -293,7 +294,7 @@ export class NoteExplorer {
       const selectedFile: File = file ? file : this.treeView.selection[0];
 
       const dirname = vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
-      const input = await this.showFileNameInputBox(dirname);
+      const input = await this.showFileNameInputBox(dirname, path.basename(selectedFile.uri.fsPath));
       if (!input) return;
 
       this.fileSystemProvider.rename(selectedFile.uri, vscode.Uri.file(input), { overwrite: false });
