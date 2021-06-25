@@ -193,7 +193,7 @@ export class Search {
          return matchesOrError
             .sort((x, y) => x.path.text.localeCompare(y.path.text))
             .map(match => {
-               const matchedLineText = this.useSearchOptions[UseRegularExpressionId] ? [match.submatches[0].match.text] : match.lines.text.match(`${this.escapeStringRegex(match.submatches[0].match.text)}.*`);
+               const matchedLineText = match.lines.text.match(`${this.escapeStringRegex(match.submatches[0].match.text)}.*`);
                return new SearchResult(vscode.Uri.file(match.path.text), matchedLineText ? matchedLineText[0] : match.lines.text, match.line_number - 1);
             });
       }
