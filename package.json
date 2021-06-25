@@ -10,11 +10,7 @@
    "categories": [
       "Other"
    ],
-   "icon": "img/icon.svg",
-   "galleryBanner": {
-      "color": "#56aeff",
-      "theme": "dark"
-   },
+   "icon": "img/icon.png",
    "license": "MIT",
    "homepage": "https://github.com/k-kuroguro/vs-knowledge-notes/blob/master/README.md",
    "repository": {
