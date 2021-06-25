@@ -3,13 +3,18 @@
    "displayName": "VS Knowledge Notes",
    "description": "VSCode extension for managing your knowledge.",
    "publisher": "k-kuroguro",
-   "version": "0.0.1",
+   "version": "1.0.0",
    "engines": {
       "vscode": "^1.57.0"
    },
    "categories": [
       "Other"
    ],
+   "icon": "img/icon.svg",
+   "galleryBanner": {
+      "color": "#56aeff",
+      "theme": "dark"
+   },
    "license": "MIT",
    "homepage": "https://github.com/k-kuroguro/vs-knowledge-notes/blob/master/README.md",
    "repository": {
