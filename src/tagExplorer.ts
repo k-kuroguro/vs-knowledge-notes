@@ -98,11 +98,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                   this.pushUniqueTags(results, label, fileUris);
                }
             } catch (e: unknown) {
-               if (e instanceof YAMLException) {
-                  vscode.window.showErrorMessage(`Duplicated YAML front matter key in ${match.path.text}`);
-               } else {
-                  vscode.window.showErrorMessage(`${e} @ ${match.path.text}`);
-               }
+               vscode.window.showErrorMessage(`${e} @ ${match.path.text}`);
                continue;
             }
          }
