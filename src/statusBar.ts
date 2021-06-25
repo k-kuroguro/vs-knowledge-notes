@@ -27,9 +27,7 @@ export class StatusBar {
    }
 
    dispose(): void {
-      for (const disposable of this.disposables) {
-         disposable.dispose();
-      }
+      this.disposables.forEach(d => d.dispose());
    }
 
    private update(): void {

@@ -169,9 +169,7 @@ export class TagExplorer {
    }
 
    dispose(): void {
-      for (const disposable of this.disposables) {
-         disposable.dispose();
-      }
+      this.disposables.forEach(d => d.dispose());
    }
 
    //#region commands
