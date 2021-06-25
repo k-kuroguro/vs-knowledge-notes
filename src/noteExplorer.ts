@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as trash from 'trash';
 import { FileSystemProvider, File } from './fileSystemProvider';
 import { FileAccess } from './fileAccess';
 import { Config } from './config';
@@ -310,7 +311,7 @@ export class NoteExplorer {
             if (input === 'Cancel') return;
             if (input === 'Do not ask me again') this.config.confirmDelete = false;
          }
-         this.fileSystemProvider.delete(uri, { recursive: true });
+         trash(uri.fsPath, { glob: false });
       }
    }
 

@@ -3,6 +3,7 @@
 'use strict';
 
 const path = require('path');
+const copyPlugin = require("copy-webpack-plugin");
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -36,6 +37,20 @@ const config = {
             ]
          }
       ]
-   }
+   },
+   plugins: [
+      //copy executable files to dist for trash library.
+      new copyPlugin({
+         patterns: [
+            {
+               from: path.posix.join(path.resolve(__dirname, 'node_modules', 'trash', 'lib').replace(/\\/g, '/'), '*[!.js]'),
+               to: path.resolve(__dirname, 'dist', '[name][ext]')
+            }
+         ],
+         options: {
+            concurrency: 50
+         }
+      })
+   ]
 };
 module.exports = config;
