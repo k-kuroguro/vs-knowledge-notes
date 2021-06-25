@@ -44,10 +44,11 @@ as you like.
 ## View Mode
 View mode is for reading only. File is added read-only attribute and markdown file is opened as preview.
 
-To preview markdown, you can use vscode standard or [Markdown Preview Enhanced](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced). See (Settings)[#Settings].
+To preview markdown, you can use vscode standard or [Markdown Preview Enhanced](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced). See [Settings](#Settings).
 
 # Tags
 ![Tag Explorer](./img/tag_explorer.png)
+
 You can set tags for your notes. The tags you set will be displayed in the side menu.
 
 You can set the tag as follows.
@@ -57,7 +58,7 @@ You can set the tag as follows.
 tags: [software/algorithm, math]
 ---
 ```
-Tags can be hierarchized by delimiting them with a `/`. The delimiter can be changed freely. See (Settings)[#Settings].
+Tags can be hierarchized by delimiting them with a `/`. The delimiter can be changed freely. See [Settings](#Settings).
 
 # Search
 ![Demo](./img/search_demo.gif)
