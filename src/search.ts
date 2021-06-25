@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import escapeStringRegexp from 'escape-string-regexp';
 import { Config } from './config';
 import { extensionName } from './constants';
 import { ripGrep as rg, Options as rgOptions, RipGrepError, Match } from './ripgrep';
@@ -29,10 +30,11 @@ class SearchResult implements vscode.QuickPickItem {
 
 }
 
+const [MatchCaseId, MatchWholeWordId, UseRegularExpressionId] = [0, 1, 2] as const;
 const SearchOptions = {
-   MatchCase: { id: 0, tooltip: 'Match Case', icon: 'case-sensitive.svg' },
-   MatchWholeWord: { id: 1, tooltip: 'Match Whole Word', icon: 'whole-word.svg' },
-   UseRegularExpression: { id: 2, tooltip: 'Use Regular Expression', icon: 'regex.svg' }
+   MatchCase: { id: MatchCaseId, tooltip: 'Match Case', icon: 'case-sensitive.svg' },
+   MatchWholeWord: { id: MatchWholeWordId, tooltip: 'Match Whole Word', icon: 'whole-word.svg' },
+   UseRegularExpression: { id: UseRegularExpressionId, tooltip: 'Use Regular Expression', icon: 'regex.svg' }
 } as const;
 type SearchOptions = typeof SearchOptions[keyof typeof SearchOptions];
 type SearchOptionId = typeof SearchOptions[keyof typeof SearchOptions]['id'];
@@ -84,10 +86,10 @@ export class Search {
    private readonly config: Config = Config.getInstance();
    private readonly disposables: vscode.Disposable[] = [];
 
-   useSearchOptions: UseSearchOptions = {
-      0: false,
-      1: false,
-      2: false
+   private useSearchOptions: UseSearchOptions = {
+      [MatchCaseId]: false,
+      [MatchWholeWordId]: false,
+      [UseRegularExpressionId]: false
    };
 
    constructor(useSearchOptions?: UseSearchOptions) {
@@ -112,7 +114,6 @@ export class Search {
       const matchesOrError = await rg(
          this.config.notesDir.fsPath, options
       ).catch((e: RipGrepError) => {
-         console.log(e);
          return e.stderr;
       });
       return matchesOrError;
@@ -125,12 +126,17 @@ export class Search {
             const quickPick = vscode.window.createQuickPick<SearchResult>();
             const optionButtons = Object
                .values(SearchOptions)
-               .map(value => new OptionButton(value, this.useSearchOptions[value.id]))
-               .sort((x, y) => {
-                  if (x.option.id < y.option.id) return -1;
-                  if (x.option.id > y.option.id) return 1;
-                  return 0;
-               });
+               .map(value => new OptionButton(value, this.useSearchOptions[value.id]));
+
+            const updateResults = async (input: string) => {
+               if (input === '') {
+                  quickPick.items = [];
+                  return;
+               }
+               quickPick.busy = true;
+               quickPick.items = await this.searchByDefault(input);
+               quickPick.busy = false;
+            };
 
             quickPick.placeholder = 'search';
             quickPick.title = 'Search In Notes';
@@ -138,7 +144,7 @@ export class Search {
             disposables.push(
                quickPick.onDidAccept(() => {
                   const [uri, lineNumber] = [quickPick.selectedItems[0]?.uri, quickPick.selectedItems[0]?.lineNumber];
-                  if (!uri || !lineNumber) return;
+                  if (!uri || typeof lineNumber === 'undefined') return;
                   const range = new vscode.Range(lineNumber, 0, lineNumber, 0);
                   vscode.window.showTextDocument(uri, { selection: range }).then(editor => {
                      editor.revealRange(range);
@@ -146,29 +152,7 @@ export class Search {
                   resolve(true);
                }),
                quickPick.onDidChangeValue(async value => {
-                  if (value === '') {
-                     quickPick.items = [];
-                     return;
-                  }
-                  quickPick.busy = true;
-
-                  const matchesOrError = await this.runRipGrep(value,
-                     this.useSearchOptions[0],
-                     this.useSearchOptions[1],
-                     this.useSearchOptions[2]
-                  );
-
-                  if (typeof matchesOrError === 'string') {
-                     quickPick.items = [new SearchResult(matchesOrError)];
-                  } else if (!matchesOrError.length) {
-                     quickPick.items = [new SearchResult('No matching results')];
-                  } else {
-                     quickPick.items = matchesOrError
-                        .sort((x, y) => x.path.text.localeCompare(y.path.text))
-                        .map(match => new SearchResult(vscode.Uri.file(match.path.text), match.lines.text, match.line_number - 1));
-                  }
-
-                  quickPick.busy = false;
+                  updateResults(value);
                }),
                quickPick.onDidTriggerButton(e => {
                   const optionButton = optionButtons.find(button => button.tooltip === e.tooltip);
@@ -181,6 +165,7 @@ export class Search {
                      this.useSearchOptions[optionButton.option.id] = true;
                   }
                   quickPick.buttons = Object.values(optionButtons);
+                  updateResults(quickPick.value);
                }),
                quickPick.onDidHide(() => {
                   resolve(false);
@@ -191,6 +176,31 @@ export class Search {
       } finally {
          disposables.forEach(d => d.dispose());
       }
+   }
+
+   private async searchByDefault(input: string): Promise<SearchResult[]> {
+      const matchesOrError = await this.runRipGrep(input,
+         this.useSearchOptions[MatchCaseId],
+         this.useSearchOptions[MatchWholeWordId],
+         this.useSearchOptions[UseRegularExpressionId]
+      );
+
+      if (typeof matchesOrError === 'string') {
+         return [new SearchResult(matchesOrError)];
+      } else if (!matchesOrError.length) {
+         return [new SearchResult('No matching results')];
+      } else {
+         return matchesOrError
+            .sort((x, y) => x.path.text.localeCompare(y.path.text))
+            .map(match => {
+               const matchedLineText = this.useSearchOptions[UseRegularExpressionId] ? [match.submatches[0].match.text] : match.lines.text.match(`${this.escapeStringRegex(match.submatches[0].match.text)}.*`);
+               return new SearchResult(vscode.Uri.file(match.path.text), matchedLineText ? matchedLineText[0] : match.lines.text, match.line_number - 1);
+            });
+      }
+   }
+
+   private escapeStringRegex(string: string) {
+      return escapeStringRegexp(string);
    }
 
    private registerCommands(): vscode.Disposable[] {
