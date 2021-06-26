@@ -15,7 +15,22 @@ export class FileAccess {
 
    static async makeReadonly(uri: vscode.Uri): Promise<boolean> {
       return new Promise<boolean>((resolve, reject) => {
-         execFile('attrib', ['+r', uri.fsPath], error => {
+         let command: string, arg: string;
+         switch (process.platform) {
+            case 'win32':
+               command = 'attrib';
+               arg = '+r';
+               break;
+            case 'linux':
+            case 'darwin':
+               command = 'chmod';
+               arg = 'u-w';
+               break;
+            default:
+               vscode.window.showErrorMessage(`Not supporting ${process.platform}`);
+               return;
+         }
+         execFile('attrib', [arg, uri.fsPath], error => {
             if (error) return resolve(false);
             return resolve(true);
          });
@@ -24,7 +39,22 @@ export class FileAccess {
 
    static async makeWritable(uri: vscode.Uri): Promise<boolean> {
       return new Promise<boolean>((resolve, reject) => {
-         execFile('attrib', ['-r', uri.fsPath], error => {
+         let command: string, arg: string;
+         switch (process.platform) {
+            case 'win32':
+               command = 'attrib';
+               arg = '-r';
+               break;
+            case 'linux':
+            case 'darwin':
+               command = 'chmod';
+               arg = 'u+w';
+               break;
+            default:
+               vscode.window.showErrorMessage(`Not supporting ${process.platform}`);
+               return;
+         }
+         execFile('attrib', [arg, uri.fsPath], error => {
             if (error) return resolve(false);
             return resolve(true);
          });

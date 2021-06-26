@@ -1,9 +1,13 @@
 # Change Log
 
-All notable changes to the "vsknowledge-notes" extension will be documented in this file.
+## [1.1.0]
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+ - Support macOS and Linux
 
-## [Unreleased]
+## [1.0.1]
+
+ - Change Extension Icon
+
+## [1.0.0]
 
 - Initial release
