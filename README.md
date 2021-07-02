@@ -3,6 +3,8 @@ VSCode extension for managing your knowledge.
 
 ![Sample](./img/sample.png)
 
+### Tested at **Windows** only.
+
 # Feature
 - Quick access to your knowledge via activity bar.
 - Use read-only mode for safely viewing.

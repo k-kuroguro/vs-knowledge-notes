@@ -3,10 +3,7 @@
 ## [1.1.1]
 
  - Update docs
-
-## [1.1.0]
-
- - Support macOS and Linux
+ - Fix icon transparent
 
 ## [1.0.1]
 
