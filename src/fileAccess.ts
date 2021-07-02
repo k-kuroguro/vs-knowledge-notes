@@ -23,9 +23,7 @@ export class FileAccess {
                break;
             case 'linux':
             case 'darwin':
-               command = 'chmod';
-               arg = 'u-w';
-               break;
+            //TODO: support macos, linux
             default:
                vscode.window.showErrorMessage(`Not supporting ${process.platform}`);
                return;
@@ -47,9 +45,7 @@ export class FileAccess {
                break;
             case 'linux':
             case 'darwin':
-               command = 'chmod';
-               arg = 'u+w';
-               break;
+            //TODO: support macos, linux
             default:
                vscode.window.showErrorMessage(`Not supporting ${process.platform}`);
                return;
