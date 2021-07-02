@@ -25,7 +25,8 @@ class Utils {
       switch (error?.code) {
          case 'ENEOT':
             return vscode.FileSystemError.FileNotFound();
-         case 'EISDIR': return vscode.FileSystemError.FileIsADirectory();
+         case 'EISDIR':
+            return vscode.FileSystemError.FileIsADirectory();
          case 'EEXIST':
             return vscode.FileSystemError.FileExists();
          case 'EPERM':
