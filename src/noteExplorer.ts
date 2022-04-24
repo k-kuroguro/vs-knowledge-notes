@@ -113,6 +113,7 @@ export class NoteExplorer {
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.refresh`, () => this.refresh()),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.newFile`, (file?: File) => this.createNewFile(file)),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.newFolder`, (file?: File) => this.createNewFolder(file)),
+         vscode.commands.registerCommand(`${extensionName}.noteExplorer.openInIntegratedTerminal`, (file?: File) => this.openInIntegratedTerminal(file)),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.findInFolder`, (file?: File) => this.findInFolder(file)),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.cut`, (file?: File) => this.cut(file)),
          vscode.commands.registerCommand(`${extensionName}.noteExplorer.copy`, (file?: File) => this.copy(file)),
@@ -135,7 +136,7 @@ export class NoteExplorer {
             return undefined;
          }
       });
-      return input && dirname ? path.join(dirname.fsPath, input) : input;
+      return (input && dirname ? path.join(dirname.fsPath, input) : input)?.trim();
    }
 
    private geSelectedFiles(rightClickedFile?: File): File[] | undefined {
@@ -202,6 +203,15 @@ export class NoteExplorer {
       const filename = vscode.Uri.file(input);
 
       this.fileSystemProvider.createDirectory(filename);
+   }
+
+   private openInIntegratedTerminal(file?: File): void {
+      if (!this.config.notesDir) return;
+      const selectedFile: File = file ? file : this.treeView.selection.length ? this.treeView.selection[0] : new File(this.config.notesDir, vscode.FileType.Directory);
+      const dirname: vscode.Uri = selectedFile.type === vscode.FileType.Directory ? selectedFile.uri : vscode.Uri.file(path.dirname(selectedFile.uri.fsPath));
+
+      const terminal = vscode.window.createTerminal({ cwd: dirname });
+      terminal.show();
    }
 
    private findInFolder(file?: File): void {

@@ -50,6 +50,11 @@
             "icon": "$(new-folder)"
          },
          {
+            "command": "vs-knowledge-notes.noteExplorer.openInIntegratedTerminal",
+            "category": "VS Knowledge Notes",
+            "title": "Open In Integrated Terminal"
+         },
+         {
             "command": "vs-knowledge-notes.noteExplorer.findInFolder",
             "category": "VS Knowledge Notes",
             "title": "Find in Folder"
@@ -233,6 +238,11 @@
                "command": "vs-knowledge-notes.noteExplorer.newFolder",
                "when": "view == vs-knowledge-notes.noteExplorer",
                "group": "1_creation@2"
+            },
+            {
+               "command": "vs-knowledge-notes.noteExplorer.openInIntegratedTerminal",
+               "when": "view == vs-knowledge-notes.noteExplorer",
+               "group": "1_creation@3"
             },
             {
                "command": "vs-knowledge-notes.noteExplorer.findInFolder",
