@@ -136,7 +136,7 @@ export class NoteExplorer {
             return undefined;
          }
       });
-      return input && dirname ? path.join(dirname.fsPath, input) : input;
+      return (input && dirname ? path.join(dirname.fsPath, input) : input)?.trim();
    }
 
    private geSelectedFiles(rightClickedFile?: File): File[] | undefined {
