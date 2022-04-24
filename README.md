@@ -20,7 +20,7 @@ Execute `VS Knowledge Notes: Set Notes Directory` or click `Set Notes Directory`
 # File Operations
 ![Demo](./img/file_operations.gif)
 You can operate file in notes directory by GUI, commands and keyboard shortcuts.
-## commands
+## Commands
  - `VS Knowledge Notes: New File`
  - `VS Knowledge Notes: New Folder`
 ## Keyboard Shortcuts
