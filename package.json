@@ -396,7 +396,7 @@
       "escape-string-regexp": "^5.0.0",
       "fs-extra": "^9.1.0",
       "gray-matter": "^4.0.3",
-      "trash": "^7.2.0",
+      "trash": "^8.1.1",
       "vscode-ripgrep": "^1.11.3"
    }
 }
